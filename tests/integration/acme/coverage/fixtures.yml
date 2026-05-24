@@ -1,0 +1,3145 @@
+airbyte:
+  read_get_connection_schema:
+    args:
+      connection_id: $ACME_AIRBYTE_CONNECTION_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_connection_state:
+    args:
+      connection_id: $ACME_AIRBYTE_CONNECTION_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_destination:
+    args:
+      destination_id: $ACME_AIRBYTE_DESTINATION_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_job_logs:
+    args:
+      job_id: $ACME_AIRBYTE_JOB_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_source:
+    args:
+      source_id: $ACME_AIRBYTE_SOURCE_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_workspace:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_list_connections:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_destinations:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_jobs:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_sources:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  write_cancel_job:
+    args:
+      job_id: $ACME_AIRBYTE_JOB_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - cancelled
+  write_create_connection:
+    args:
+      source_id: $ACME_AIRBYTE_SOURCE_ID
+      destination_id: $ACME_AIRBYTE_DESTINATION_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_disable_connection:
+    args:
+      connection_id: $ACME_AIRBYTE_CONNECTION_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - updated
+  write_enable_connection:
+    args:
+      connection_id: $ACME_AIRBYTE_CONNECTION_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - updated
+  write_reset_connection:
+    args:
+      connection_id: $ACME_AIRBYTE_CONNECTION_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_trigger_sync:
+    args:
+      connection_id: $ACME_AIRBYTE_CONNECTION_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_update_connection:
+    args:
+      connection_id: $ACME_AIRBYTE_CONNECTION_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - updated
+airflow:
+  read_get_dag_dependencies:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+  read_get_dag_source:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+  read_get_import_errors:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_pool:
+    args:
+      name: default_pool
+    expect_shape:
+      status:
+      - ok
+  read_get_run:
+    args:
+      dag_id: acme_churn_calc
+      run_id: manual__acme_coverage
+    expect_shape:
+      run: dict
+      status:
+      - ok
+  read_get_task_logs:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+  read_get_variable:
+    args:
+      key: acme_coverage_marker
+    expect_shape:
+      status:
+      - ok
+  read_get_xcom:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+  read_list_dag_runs:
+    args:
+      dag_id: acme_churn_calc
+    expect_shape:
+      status:
+      - ok
+  read_list_dags:
+    args: {}
+    expect_shape:
+      dags: list_min_2
+      status:
+      - ok
+  read_list_pools:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_task_instances:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+    expect_shape:
+      status:
+      - ok
+  read_list_variables:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  write_clear_task_instance:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_dag:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_delete_dag:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_mark_task_failed:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_mark_task_success:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_pause_dag:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_set_pool:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_set_variable:
+    args:
+      key: acme_coverage_marker_$TIMESTAMP
+      value: seeded
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_trigger_dag:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_unpause_dag:
+    args:
+      dag_id: acme_etl_daily
+      run_id: manual__acme_coverage
+      task_id: extract
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+bigquery:
+  read_explain_query:
+    args:
+      sql: select 1 as acme_smoke
+    expect_shape:
+      status:
+      - ok
+  read_get_query_history:
+    args:
+      sql: select 1 as acme_smoke
+    expect_shape:
+      status:
+      - ok
+  read_get_row_count:
+    args:
+      dataset: acme_analytics
+      table: dim_customers
+    expect_shape:
+      row_count: positive_int
+      status:
+      - ok
+  read_get_schema:
+    args:
+      dataset: acme_analytics
+      table: dim_customers
+    expect_shape:
+      columns: non_empty_list
+      status:
+      - ok
+  read_get_slot_usage:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_storage_size:
+    args:
+      dataset: acme_analytics
+      table: dim_customers
+    expect_shape:
+      status:
+      - ok
+  read_get_table_freshness:
+    args:
+      dataset: acme_analytics
+      table: dim_customers
+    expect_shape:
+      status:
+      - ok
+  read_list_datasets:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_jobs:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_tables:
+    args:
+      dataset: acme_analytics
+    expect_shape:
+      tables: list_min_2
+      status:
+      - ok
+  read_query_select:
+    args:
+      sql: select cust_id, segment from `acme_analytics.dim_customers` order by cust_id limit 5
+    expect_shape:
+      rows: non_empty_list
+      status:
+      - ok
+  read_search_columns:
+    args:
+      dataset: acme_analytics
+      pattern: churn
+    expect_shape:
+      status:
+      - ok
+  write_create_dataset:
+    args:
+      dataset: acme_analytics
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_table:
+    args:
+      columns:
+      - name: id
+        type: integer
+      schema: core
+      table: coverage_test_$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_view:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_execute_sql:
+    args:
+      sql: select 1 as acme_smoke
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_export_to_gcs:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_load_from_gcs:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_run_query_save_to_table:
+    args:
+      sql: select 1 as acme_smoke
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+confluence:
+  read_get_comments:
+    args:
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_labels:
+    args:
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_page:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      page: dict
+      status:
+      - ok
+  read_get_page_children:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_page_history:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_space:
+    args:
+      space_key: $ACME_CONFLUENCE_SPACE_KEY
+    expect_shape:
+      status:
+      - ok
+  read_list_spaces:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_search_attachments:
+    args:
+      query: churn
+    expect_shape:
+      status:
+      - ok
+  read_search_pages:
+    args:
+      query: churn
+    expect_shape:
+      pages: non_empty_list
+      status:
+      - ok
+  write_add_label:
+    args:
+      label: dataclaw-acme-coverage
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_append_to_page:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_attachment:
+    args:
+      content: Acme coverage test
+      filename: dataclaw-acme-coverage.txt
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_comment:
+    args:
+      body: Acme coverage test
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_page:
+    args:
+      body: Acme coverage test
+      space_key: $ACME_CONFLUENCE_SPACE_KEY
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_delete_page:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_move_page:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+      parent_id: $ACME_CONFLUENCE_ARCHITECTURE_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_update_page:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_CONFLUENCE_PIPELINE_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+      version: 2
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+dagster:
+  read_get_asset_checks:
+    args:
+      asset_key: customers
+      job_name: acme_assets
+    expect_shape:
+      status:
+      - ok
+  read_get_asset_materializations:
+    args:
+      asset_key: customers
+      job_name: acme_assets
+    expect_shape:
+      status:
+      - ok
+  read_get_event_logs:
+    args:
+      run_id: $ACME_DAGSTER_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_run:
+    args:
+      run_id: $ACME_DAGSTER_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_run_logs:
+    args:
+      run_id: $ACME_DAGSTER_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_run_steps:
+    args:
+      run_id: $ACME_DAGSTER_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_schedule_state:
+    args:
+      name: $ACME_DAGSTER_SCHEDULE
+    expect_shape:
+      status:
+      - ok
+  read_get_sensor_state:
+    args:
+      name: $ACME_DAGSTER_SENSOR
+    expect_shape:
+      status:
+      - ok
+  read_list_assets:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_jobs:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_partitions:
+    args:
+      asset_key: customers
+    expect_shape:
+      status:
+      - ok
+  read_list_schedules:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_sensors:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  write_backfill_partitions:
+    args:
+      asset_key: customers
+      partitions:
+      - $ACME_DAGSTER_PARTITION
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_launch_sensor:
+    args:
+      name: $ACME_DAGSTER_SENSOR
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_materialize_asset:
+    args:
+      asset_key: customers
+      job_name: $ACME_DAGSTER_JOB_NAME
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_start_schedule:
+    args:
+      name: $ACME_DAGSTER_SCHEDULE
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_stop_schedule:
+    args:
+      name: $ACME_DAGSTER_SCHEDULE
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_terminate_run:
+    args:
+      run_id: $ACME_DAGSTER_RUN_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - terminated
+  write_trigger_job:
+    args:
+      job_name: $ACME_DAGSTER_JOB_NAME
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+databricks:
+  read_get_lineage:
+    args:
+      asset: $ACME_DATABRICKS_TABLE
+    expect_shape:
+      status:
+      - ok
+  read_get_notebook:
+    args:
+      path: $ACME_DATABRICKS_NOTEBOOK_PATH
+    expect_shape:
+      status:
+      - ok
+  read_get_query_history:
+    args:
+      limit: 5
+    expect_shape:
+      status:
+      - ok
+  read_get_row_count:
+    args:
+      schema: silver
+      table: events
+    expect_shape:
+      status:
+      - ok
+  read_get_run_logs:
+    args:
+      run_id: $ACME_DATABRICKS_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_schema:
+    args:
+      schema: silver
+      table: events
+    expect_shape:
+      status:
+      - ok
+  read_get_table_freshness:
+    args:
+      schema: silver
+      table: events
+    expect_shape:
+      status:
+      - ok
+  read_get_unity_asset:
+    args:
+      full_name: $ACME_DATABRICKS_TABLE
+    expect_shape:
+      status:
+      - ok
+  read_list_clusters:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_jobs:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_tables:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_warehouses:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_query_select:
+    args:
+      sql: $ACME_DATABRICKS_EVENTS_SELECT_SQL
+    expect_shape:
+      status:
+      - ok
+  write_create_table:
+    args:
+      columns:
+      - name: id
+        type: integer
+      schema: silver
+      table: acme_coverage_events
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_create_view:
+    args:
+      select_sql: $ACME_DATABRICKS_EVENTS_VIEW_SELECT_SQL
+      view: $ACME_DATABRICKS_EVENTS_VIEW
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_execute_sql:
+    args:
+      sql: create or replace table silver.acme_coverage_smoke (id int)
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_run_notebook:
+    args:
+      path: $ACME_DATABRICKS_NOTEBOOK_PATH
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_start_cluster:
+    args:
+      cluster_id: $ACME_DATABRICKS_CLUSTER_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_stop_cluster:
+    args:
+      cluster_id: $ACME_DATABRICKS_CLUSTER_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_trigger_job:
+    args:
+      job_id: $ACME_DATABRICKS_JOB_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_update_unity_grants:
+    args:
+      changes:
+      - add:
+        - SELECT
+        principal: data-team
+      full_name: $ACME_DATABRICKS_TABLE
+      securable_type: table
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+dbt:
+  read_get_lineage:
+    args:
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_manifest:
+    args:
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_model_docs:
+    args:
+      name: dim_customers
+      project_path: $ACME_DBT_PROJECT_PATH
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_model_source:
+    args:
+      name: dim_customers
+      project_path: $ACME_DBT_PROJECT_PATH
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_run_artifacts:
+    args:
+      paths:
+      - manifest.json
+      - run_results.json
+      project_path: $ACME_DBT_PROJECT_PATH
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_run_logs:
+    args:
+      model: dim_customers
+      project_path: $ACME_DBT_PROJECT_PATH
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_source_freshness:
+    args:
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_test_results:
+    args:
+      unique_id: test.dataclaw.fct_orders_not_null_order_id
+      project_path: $ACME_DBT_PROJECT_PATH
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_list_exposures:
+    args:
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_list_models:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_runs:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_tests:
+    args:
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  write_cancel_run:
+    args:
+      model: dim_customers
+      project_path: $ACME_DBT_PROJECT_PATH
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_model:
+    args:
+      model: dim_customers
+      project_path: $ACME_DBT_PROJECT_PATH
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_trigger_run:
+    args:
+      model: dim_customers
+      project_path: $ACME_DBT_PROJECT_PATH
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_trigger_seed:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_trigger_snapshot:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_trigger_test:
+    args:
+      model: dim_customers
+      project_path: $ACME_DBT_PROJECT_PATH
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_update_model:
+    args:
+      model: dim_customers
+      project_path: $ACME_DBT_PROJECT_PATH
+      run_id: $ACME_DBT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+fivetran:
+  read_get_connector_logs:
+    args:
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_connector_schema:
+    args:
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_connector_status:
+    args:
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_data_volume:
+    args:
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_destination:
+    args:
+      destination_id: $ACME_FIVETRAN_DESTINATION_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_metadata:
+    args:
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_sync_history:
+    args:
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+    expect_shape:
+      status:
+      - ok
+  read_list_connectors:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_destinations:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  write_delete_connector:
+    args:
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_modify_connector_schema:
+    args:
+      config:
+        schemas: {}
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_pause_connector:
+    args:
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_resume_connector:
+    args:
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_resync_table:
+    args:
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+      schema: postgres_to_bq
+      table: orders
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_trigger_sync:
+    args:
+      connector_id: $ACME_FIVETRAN_CONNECTOR_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+github:
+  read_get_commit:
+    args:
+      repo: $GITHUB_TEST_REPO
+      sha: $ACME_GITHUB_HEAD_SHA
+    expect_shape:
+      status:
+      - ok
+  read_get_file:
+    args:
+      path: models/staging/stg_customers.sql
+      repo: $GITHUB_TEST_REPO
+    expect_shape:
+      status:
+      - ok
+  read_get_issue:
+    args:
+      number: $ACME_GITHUB_ISSUE_NUMBER
+      repo: $GITHUB_TEST_REPO
+    expect_shape:
+      status:
+      - ok
+  read_get_pr:
+    args:
+      number: $ACME_GITHUB_PR_NUMBER
+      repo: $GITHUB_TEST_REPO
+    expect_shape:
+      status:
+      - ok
+  read_get_pr_diff:
+    args:
+      number: $ACME_GITHUB_PR_NUMBER
+      repo: $GITHUB_TEST_REPO
+    expect_shape:
+      status:
+      - ok
+  read_get_repo_metadata:
+    args:
+      repo: $GITHUB_TEST_REPO
+    expect_shape:
+      status:
+      - ok
+  read_get_workflow_run_logs:
+    args:
+      repo: $ACME_GITHUB_WORKFLOW_RUN_REPO
+      run_id: $ACME_GITHUB_WORKFLOW_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_list_branches:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_issues:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_releases:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_repos:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_workflows:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_search_code:
+    args:
+      query: churn
+    expect_shape:
+      status:
+      - ok
+  write_close_issue:
+    args:
+      path: models/staging/stg_customers.sql
+      repo: $GITHUB_TEST_REPO
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_close_pr:
+    args:
+      path: models/staging/stg_customers.sql
+      repo: $GITHUB_TEST_REPO
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_comment_on_issue:
+    args:
+      path: models/staging/stg_customers.sql
+      repo: $GITHUB_TEST_REPO
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_comment_on_pr:
+    args:
+      path: models/staging/stg_customers.sql
+      repo: $GITHUB_TEST_REPO
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_commit_file:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_branch:
+    args:
+      path: models/staging/stg_customers.sql
+      repo: $GITHUB_TEST_REPO
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_issue:
+    args:
+      path: models/staging/stg_customers.sql
+      repo: $GITHUB_TEST_REPO
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_pr:
+    args:
+      path: models/staging/stg_customers.sql
+      repo: $GITHUB_TEST_REPO
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_delete_branch:
+    args:
+      path: models/staging/stg_customers.sql
+      repo: $GITHUB_TEST_REPO
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_merge_pr:
+    args:
+      path: models/staging/stg_customers.sql
+      repo: $GITHUB_TEST_REPO
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_request_review:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+google_docs:
+  read_get_doc:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_doc_comments:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_doc_metadata:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_doc_revisions:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_list_docs:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_folder_contents:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_shared_with_me:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_search_docs:
+    args:
+      query: churn
+    expect_shape:
+      status:
+      - ok
+  write_append_to_doc:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_comment:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_doc:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_move_doc:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_rename_doc:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_replace_text:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_share_doc:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+mysql:
+  read_explain_query:
+    args:
+      sql: select invoice_id, amount_usd from acme_billing.invoices where amount_usd > 100 limit 5
+    expect_shape:
+      status:
+      - ok
+  read_get_column_stats:
+    args:
+      schema: acme_billing
+      table: invoices
+    expect_shape:
+      status:
+      - ok
+  read_get_query_history:
+    args:
+      limit: 5
+    expect_shape:
+      status:
+      - ok
+  read_get_row_count:
+    args:
+      schema: acme_billing
+      table: invoices
+    expect_shape:
+      row_count: positive_int
+      status:
+      - ok
+  read_get_schema:
+    args:
+      schema: acme_billing
+      table: invoices
+    expect_shape:
+      columns: non_empty_list
+      status:
+      - ok
+  read_get_storage_size:
+    args:
+      schema: acme_billing
+      table: invoices
+    expect_shape:
+      status:
+      - ok
+  read_get_table_freshness:
+    args:
+      schema: acme_billing
+      table: invoices
+    expect_shape:
+      status:
+      - ok
+  read_list_grants:
+    args:
+      schema: acme_billing
+      table: invoices
+    expect_shape:
+      status:
+      - ok
+  read_list_tables:
+    args:
+      schema: acme_billing
+    expect_shape:
+      tables: list_min_1
+      status:
+      - ok
+  read_list_users:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_query_select:
+    args:
+      sql: select invoice_id, customer_id, invoice_status from acme_billing.invoices order by invoice_id limit 5
+    expect_shape:
+      rows: non_empty_list
+      status:
+      - ok
+  read_sample_rows:
+    args:
+      schema: acme_billing
+      table: invoices
+    expect_shape:
+      status:
+      - ok
+  read_search_columns:
+    args:
+      pattern: invoice
+    expect_shape:
+      status:
+      - ok
+  write_create_index:
+    args:
+      columns:
+      - invoice_id
+      index_name: idx_acme_invoices_invoice_id
+      schema: acme_billing
+      table: invoices
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_table:
+    args:
+      columns:
+      - name: id
+        type: integer
+      schema: acme_billing
+      table: acme_coverage_write_probe
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_view:
+    args:
+      schema: acme_billing
+      select_sql: select invoice_id, amount_usd from acme_billing.invoices limit 10
+      view: acme_coverage_invoices_view
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_delete_rows:
+    args:
+      schema: acme_billing
+      table: acme_coverage_write_probe
+      where: id = 2
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_execute_sql:
+    args:
+      sql: create table if not exists acme_billing.acme_coverage_smoke (id integer)
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_grant_permission:
+    args:
+      role: dataclaw
+      schema: acme_billing
+      scope: SELECT
+      table: invoices
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_insert_rows:
+    args:
+      rows:
+      - id: 1
+      schema: acme_billing
+      table: acme_coverage_write_probe
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_update_rows:
+    args:
+      schema: acme_billing
+      set:
+        id: 2
+      table: acme_coverage_write_probe
+      where: id = 1
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+notion:
+  read_get_block_children:
+    args:
+      block_id: $ACME_PAGE_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_comments:
+    args:
+      page_id: $ACME_PAGE_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_database:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_page:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_list_users:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_query_database:
+    args:
+      sql: select 1 as acme_smoke
+    expect_shape:
+      status:
+      - ok
+  read_search_pages:
+    args:
+      query: churn
+    expect_shape:
+      status:
+      - ok
+  write_append_to_page:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_archive_page:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_comment:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_database:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_page:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_update_block:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_update_page_properties:
+    args:
+      content: Acme coverage test
+      page_id: $ACME_PAGE_ID
+      title: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+openai:
+  read_list_models:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+postgres:
+  read_explain_query:
+    args:
+      sql: select 1 as acme_smoke
+    expect_shape:
+      status:
+      - ok
+  read_get_column_stats:
+    args:
+      schema: raw
+      table: customers
+    expect_shape:
+      status:
+      - ok
+  read_get_query_history:
+    args:
+      limit: 5
+    expect_shape:
+      status:
+      - ok
+  read_get_row_count:
+    args:
+      schema: raw
+      table: customers
+    expect_shape:
+      row_count: positive_int
+      status:
+      - ok
+  read_get_schema:
+    args:
+      schema: raw
+      table: customers
+    expect_shape:
+      columns: non_empty_list
+      status:
+      - ok
+  read_get_storage_size:
+    args:
+      schema: raw
+      table: customers
+    expect_shape:
+      status:
+      - ok
+  read_get_table_freshness:
+    args:
+      schema: raw
+      table: customers
+    expect_shape:
+      status:
+      - ok
+  read_list_grants:
+    args:
+      schema: raw
+      table: customers
+    expect_shape:
+      status:
+      - ok
+  read_list_tables:
+    args:
+      schema: raw
+    expect_shape:
+      tables: list_min_2
+      status:
+      - ok
+  read_list_users:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_query_select:
+    args:
+      sql: select customer_id, event_type from raw.churn_events order by event_at desc limit 5
+    expect_shape:
+      rows: non_empty_list
+      status:
+      - ok
+  read_sample_rows:
+    args:
+      schema: raw
+      table: customers
+    expect_shape:
+      status:
+      - ok
+  read_search_columns:
+    args:
+      pattern: customer
+    expect_shape:
+      status:
+      - ok
+  write_create_index:
+    args:
+      columns:
+      - customer_id
+      index_name: idx_acme_customers_customer_id
+      schema: raw
+      table: customers
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_table:
+    args:
+      columns:
+      - name: id
+        type: integer
+      schema: raw
+      table: acme_coverage_write_probe
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_view:
+    args:
+      schema: raw
+      select_sql: select order_id, arr_usd from raw.orders limit 10
+      view: acme_coverage_orders_view
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_delete_rows:
+    args:
+      schema: raw
+      table: acme_coverage_write_probe
+      where: id = 2
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_execute_sql:
+    args:
+      sql: create table if not exists raw.acme_coverage_smoke (id integer)
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_grant_permission:
+    args:
+      role: dataclaw
+      schema: raw
+      scope: SELECT
+      table: customers
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_insert_rows:
+    args:
+      rows:
+      - id: 1
+      schema: raw
+      table: acme_coverage_write_probe
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_update_rows:
+    args:
+      schema: raw
+      set:
+        id: 2
+      table: acme_coverage_write_probe
+      where: id = 1
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+prefect:
+  read_get_block:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_concurrency_limit:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_deployment:
+    args:
+      deployment_id: $ACME_PREFECT_DEPLOYMENT_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_run:
+    args:
+      run_id: $ACME_PREFECT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_run_logs:
+    args:
+      run_id: $ACME_PREFECT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_task_logs:
+    args:
+      flow_run_id: $ACME_PREFECT_RUN_ID
+      task_run_id: $ACME_PREFECT_TASK_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_get_task_run:
+    args:
+      task_run_id: $ACME_PREFECT_TASK_RUN_ID
+    expect_shape:
+      status:
+      - ok
+  read_list_artifacts:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_deployments:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_flow_runs:
+    args:
+      flow_id: $ACME_PREFECT_FLOW_ID
+    expect_shape:
+      status:
+      - ok
+  read_list_flows:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_work_pools:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  write_cancel_flow_run:
+    args:
+      run_id: $ACME_PREFECT_RUN_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_deployment:
+    args:
+      deployment_name: acme_revenue_recalc/default
+      flow_name: acme_revenue_recalc
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_delete_deployment:
+    args:
+      deployment_id: $ACME_PREFECT_DEPLOYMENT_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_pause_deployment:
+    args:
+      deployment_id: $ACME_PREFECT_DEPLOYMENT_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_resume_deployment:
+    args:
+      deployment_id: $ACME_PREFECT_DEPLOYMENT_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_set_block:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_set_concurrency_limit:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_trigger_flow_run:
+    args:
+      deployment_id: $ACME_PREFECT_DEPLOYMENT_ID
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+quip:
+  read_get_folder:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_messages:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_thread:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_get_thread_history:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+  read_list_folders:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_search:
+    args:
+      query: churn
+    expect_shape:
+      status:
+      - ok
+  write_create_folder:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_thread:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_edit_thread:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_send_message:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_share_thread:
+    args:
+      name: coverage-test-$TIMESTAMP
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+redshift:
+  read_explain_query:
+    args:
+      sql: select event_id, action, actor from acme.audit_log order by event_id limit 5
+    expect_shape:
+      status:
+      - ok
+  read_get_column_stats:
+    args:
+      schema: acme
+      table: audit_log
+    expect_shape:
+      status:
+      - ok
+  read_get_disk_usage:
+    args:
+      schema: acme
+    expect_shape:
+      status:
+      - ok
+  read_get_query_history:
+    args:
+      limit: 5
+    expect_shape:
+      status:
+      - ok
+  read_get_row_count:
+    args:
+      schema: acme
+      table: audit_log
+    expect_shape:
+      status:
+      - ok
+  read_get_schema:
+    args:
+      schema: acme
+      table: audit_log
+    expect_shape:
+      status:
+      - ok
+  read_get_storage_size:
+    args:
+      schema: acme
+      table: audit_log
+    expect_shape:
+      status:
+      - ok
+  read_get_table_freshness:
+    args:
+      schema: acme
+      table: audit_log
+    expect_shape:
+      status:
+      - ok
+  read_get_workload_management:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_clusters:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_grants:
+    args:
+      schema: acme
+      table: audit_log
+    expect_shape:
+      status:
+      - ok
+  read_list_tables:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_users:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_query_select:
+    args:
+      sql: select event_id, action, actor from acme.audit_log order by event_id limit 5
+    expect_shape:
+      status:
+      - ok
+  read_sample_rows:
+    args:
+      schema: acme
+      table: audit_log
+    expect_shape:
+      status:
+      - ok
+  read_search_columns:
+    args:
+      pattern: event
+    expect_shape:
+      status:
+      - ok
+  write_create_index:
+    args:
+      columns:
+      - event_id
+      index_name: idx_acme_audit_log_event_id
+      schema: acme
+      table: audit_log
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_create_table:
+    args:
+      columns:
+      - name: id
+        type: integer
+      schema: acme
+      table: acme_coverage_write_probe
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_create_view:
+    args:
+      schema: acme
+      select_sql: select event_id, action from acme.audit_log limit 10
+      view: acme_coverage_audit_view
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_delete_rows:
+    args:
+      schema: acme
+      table: acme_coverage_write_probe
+      where: id = 2
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_execute_sql:
+    args:
+      sql: create table if not exists acme.acme_coverage_smoke (id integer)
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_grant_permission:
+    args:
+      role: $REDSHIFT_USER
+      schema: acme
+      scope: SELECT
+      table: audit_log
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_insert_rows:
+    args:
+      rows:
+      - id: 1
+      schema: acme
+      table: acme_coverage_write_probe
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+  write_pause_cluster:
+    args:
+      cluster_identifier: $REDSHIFT_CLUSTER_IDENTIFIER
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_resume_cluster:
+    args:
+      cluster_identifier: $REDSHIFT_CLUSTER_IDENTIFIER
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_update_rows:
+    args:
+      schema: acme
+      set:
+        id: 2
+      table: acme_coverage_write_probe
+      where: id = 1
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+      - executed
+snowflake:
+  read_explain_query:
+    args:
+      sql: select customer_id, event_type, event_at from MARTS.CHURN_EVENTS order by event_at desc limit 5
+    expect_shape:
+      status:
+      - ok
+  read_get_column_stats:
+    args:
+      schema: MARTS
+      table: CHURN_EVENTS
+    expect_shape:
+      status:
+      - ok
+  read_get_credit_usage:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_get_query_history:
+    args:
+      limit: 5
+    expect_shape:
+      status:
+      - ok
+  read_get_row_count:
+    args:
+      schema: MARTS
+      table: CHURN_EVENTS
+    expect_shape:
+      status:
+      - ok
+  read_get_schema:
+    args:
+      schema: MARTS
+      table: CHURN_EVENTS
+    expect_shape:
+      status:
+      - ok
+  read_get_storage_size:
+    args:
+      schema: MARTS
+      table: CHURN_EVENTS
+    expect_shape:
+      status:
+      - ok
+  read_get_table_freshness:
+    args:
+      schema: MARTS
+      table: REVENUE_DAILY
+    expect_shape:
+      status:
+      - ok
+  read_list_grants:
+    args:
+      schema: MARTS
+      table: CHURN_EVENTS
+    expect_shape:
+      status:
+      - ok
+  read_list_pipes:
+    args:
+      schema: MARTS
+    expect_shape:
+      status:
+      - ok
+  read_list_streams:
+    args:
+      schema: MARTS
+    expect_shape:
+      status:
+      - ok
+  read_list_tables:
+    args:
+      schema: MARTS
+    expect_shape:
+      status:
+      - ok
+  read_list_tasks:
+    args:
+      schema: MARTS
+    expect_shape:
+      status:
+      - ok
+  read_list_users:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_warehouses:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_query_history:
+    args:
+      limit: 5
+    expect_shape:
+      status:
+      - ok
+  read_query_select:
+    args:
+      sql: select customer_id, event_type, event_at from MARTS.CHURN_EVENTS order by event_at desc limit 5
+    expect_shape:
+      status:
+      - ok
+  read_sample_rows:
+    args:
+      schema: MARTS
+      table: CHURN_EVENTS
+    expect_shape:
+      status:
+      - ok
+  read_search_columns:
+    args:
+      pattern: event
+      schema: MARTS
+    expect_shape:
+      status:
+      - ok
+  write_create_index:
+    args:
+      columns:
+      - CUSTOMER_ID
+      index_name: IDX_ACME_CHURN_CUSTOMER
+      schema: MARTS
+      table: CHURN_EVENTS
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - executed
+      - triggered
+  write_create_pipe:
+    args:
+      file_format: CSV
+      name: ACME_COVERAGE_PIPE
+      schema: MARTS
+      stage: ACME_COVERAGE_STAGE
+      table: CHURN_EVENTS
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - executed
+      - triggered
+  write_create_table:
+    args:
+      columns:
+      - name: ID
+        type: INTEGER
+      schema: MARTS
+      table: ACME_COVERAGE_WRITE_PROBE
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - executed
+      - triggered
+  write_create_task:
+    args:
+      name: ACME_COVERAGE_TASK
+      schedule: USING CRON 0 * * * * UTC
+      schema: MARTS
+      sql: select count(*) from MARTS.REVENUE_DAILY
+      warehouse: $SNOWFLAKE_WAREHOUSE
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - executed
+      - triggered
+  write_create_view:
+    args:
+      schema: MARTS
+      select_sql: select customer_id, event_type from MARTS.CHURN_EVENTS limit 10
+      view: ACME_COVERAGE_CHURN_VIEW
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - executed
+      - triggered
+  write_delete_rows:
+    args:
+      schema: MARTS
+      table: ACME_COVERAGE_WRITE_PROBE
+      where: ID = 2
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - executed
+      - triggered
+  write_execute_sql:
+    args:
+      sql: create table if not exists MARTS.ACME_COVERAGE_SMOKE (ID INTEGER)
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - executed
+      - triggered
+  write_insert_rows:
+    args:
+      rows:
+      - ID: 1
+      schema: MARTS
+      table: ACME_COVERAGE_WRITE_PROBE
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - executed
+      - triggered
+  write_resume_warehouse:
+    args:
+      warehouse: $SNOWFLAKE_WAREHOUSE
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - executed
+      - triggered
+  write_suspend_warehouse:
+    args:
+      warehouse: $SNOWFLAKE_WAREHOUSE
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - executed
+      - triggered
+  write_update_rows:
+    args:
+      schema: MARTS
+      set:
+        ID: 2
+      table: ACME_COVERAGE_WRITE_PROBE
+      where: ID = 1
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - executed
+      - triggered
+sql_server:
+  read_explain_query:
+    args:
+      sql: select legacy_order_id, amount_usd from dbo.legacy_orders where amount_usd > 100
+    expect_shape:
+      status:
+      - ok
+  read_get_column_stats:
+    args:
+      schema: dbo
+      table: legacy_orders
+    expect_shape:
+      status:
+      - ok
+  read_get_query_history:
+    args:
+      limit: 5
+    expect_shape:
+      status:
+      - ok
+  read_get_row_count:
+    args:
+      schema: dbo
+      table: legacy_orders
+    expect_shape:
+      row_count: positive_int
+      status:
+      - ok
+  read_get_schema:
+    args:
+      schema: dbo
+      table: legacy_orders
+    expect_shape:
+      columns: non_empty_list
+      status:
+      - ok
+  read_get_storage_size:
+    args:
+      schema: dbo
+      table: legacy_orders
+    expect_shape:
+      status:
+      - ok
+  read_get_table_freshness:
+    args:
+      schema: dbo
+      table: legacy_orders
+    expect_shape:
+      status:
+      - ok
+  read_list_grants:
+    args:
+      schema: dbo
+      table: legacy_orders
+    expect_shape:
+      status:
+      - ok
+  read_list_tables:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_users:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_query_select:
+    args:
+      sql: select legacy_order_id, customer_id, status from dbo.legacy_orders order by legacy_order_id
+    expect_shape:
+      rows: non_empty_list
+      status:
+      - ok
+  read_sample_rows:
+    args:
+      schema: dbo
+      table: legacy_orders
+    expect_shape:
+      status:
+      - ok
+  read_search_columns:
+    args:
+      pattern: legacy
+    expect_shape:
+      status:
+      - ok
+  write_create_index:
+    args:
+      columns:
+      - legacy_order_id
+      index_name: idx_acme_legacy_orders_id
+      schema: dbo
+      table: legacy_orders
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_table:
+    args:
+      columns:
+      - name: id
+        type: integer
+      schema: dbo
+      table: acme_coverage_write_probe
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_view:
+    args:
+      schema: dbo
+      select_sql: select legacy_order_id, amount_usd from dbo.legacy_orders
+      view: acme_coverage_legacy_orders_view
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_delete_rows:
+    args:
+      schema: dbo
+      table: acme_coverage_write_probe
+      where: id = 2
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_execute_sql:
+    args:
+      sql: if object_id(N'dbo.acme_coverage_smoke', N'U') is null create table dbo.acme_coverage_smoke (id int)
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_grant_permission:
+    args:
+      role: public
+      schema: dbo
+      scope: SELECT
+      table: legacy_orders
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_insert_rows:
+    args:
+      rows:
+      - id: 1
+      schema: dbo
+      table: acme_coverage_write_probe
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_update_rows:
+    args:
+      schema: dbo
+      set:
+        id: 2
+      table: acme_coverage_write_probe
+      where: id = 1
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+sqlite:
+  read_explain_query:
+    args:
+      limit: 5
+      sql: select * from orders where net_revenue > 1000
+    expect_shape:
+      status:
+      - ok
+  read_get_column_stats:
+    args:
+      table: customers
+    expect_shape:
+      status:
+      - ok
+  read_get_row_count:
+    args:
+      table: customers
+    expect_shape:
+      status:
+      - ok
+  read_get_schema:
+    args:
+      table: customers
+    expect_shape:
+      status:
+      - ok
+  read_get_storage_size:
+    args:
+      table: orders
+    expect_shape:
+      status:
+      - ok
+  read_get_table_freshness:
+    args:
+      table: orders
+    expect_shape:
+      status:
+      - ok
+  read_list_tables:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_query_select:
+    args:
+      limit: 5
+      sql: select customer_id, segment from customers order by customer_id
+    expect_shape:
+      status:
+      - ok
+  read_sample_rows:
+    args:
+      limit: 2
+      table: orders
+    expect_shape:
+      status:
+      - ok
+  read_search_columns:
+    args:
+      pattern: customer
+    expect_shape:
+      status:
+      - ok
+  write_create_index:
+    args:
+      columns:
+      - customer_id
+      index_name: idx_acme_coverage_orders_customer
+      table: orders
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_table:
+    args:
+      columns:
+      - name: id
+        type: integer
+      - name: note
+        type: text
+      table: acme_coverage_disposable
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_view:
+    args:
+      select_sql: select order_id, net_revenue from orders limit 5
+      view: acme_coverage_orders_view
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_delete_rows:
+    args:
+      table: test_summary
+      where: id = 9001
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_execute_sql:
+    args:
+      sql: drop table if exists acme_coverage_disposable
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_insert_rows:
+    args:
+      rows:
+      - id: 9001
+        note: acme coverage insert
+      table: test_summary
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_update_rows:
+    args:
+      set:
+        note: acme coverage update
+      table: test_summary
+      where: id = 1
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+trino:
+  read_explain_query:
+    args:
+      sql: select order_id, amount_usd from memory.default.acme_orders where amount_usd > 100
+    expect_shape:
+      status:
+      - ok
+  read_get_column_stats:
+    args:
+      schema: default
+      table: acme_orders
+    expect_shape:
+      status:
+      - ok
+  read_get_query_history:
+    args:
+      sql: select 1 as acme_smoke
+    expect_shape:
+      status:
+      - ok
+  read_get_row_count:
+    args:
+      schema: default
+      table: acme_orders
+    expect_shape:
+      row_count: positive_int
+      status:
+      - ok
+  read_get_schema:
+    args:
+      schema: default
+      table: acme_orders
+    expect_shape:
+      columns: non_empty_list
+      status:
+      - ok
+  read_get_storage_size:
+    args:
+      schema: default
+      table: acme_orders
+    expect_shape:
+      status:
+      - ok
+  read_get_table_freshness:
+    args:
+      schema: default
+      table: acme_orders
+    expect_shape:
+      status:
+      - ok
+  read_list_grants:
+    args:
+      schema: default
+      table: acme_orders
+    expect_shape:
+      status:
+      - ok
+  read_list_tables:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_list_users:
+    args: {}
+    expect_shape:
+      status:
+      - ok
+  read_query_select:
+    args:
+      sql: select order_id, customer_id, segment from memory.default.acme_orders order by order_id
+    expect_shape:
+      rows: non_empty_list
+      status:
+      - ok
+  read_sample_rows:
+    args:
+      schema: default
+      table: acme_orders
+    expect_shape:
+      status:
+      - ok
+  read_search_columns:
+    args:
+      pattern: order
+    expect_shape:
+      status:
+      - ok
+  write_create_table:
+    args:
+      columns:
+      - name: id
+        type: integer
+      schema: default
+      table: acme_coverage_write_probe
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_create_view:
+    args:
+      schema: default
+      select_sql: select order_id, amount_usd from memory.default.acme_orders
+      view: acme_coverage_orders_view
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_execute_sql:
+    args:
+      sql: create table if not exists memory.default.acme_coverage_smoke (id integer)
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered
+  write_insert_rows:
+    args:
+      rows:
+      - id: 1
+      schema: default
+      table: acme_coverage_write_probe
+    expect_shape:
+      status:
+      - ok
+      - pending_approval
+      - created
+      - triggered

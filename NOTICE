@@ -1,0 +1,41 @@
+DataClaw
+Copyright 2026 DataClaw contributors
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this file except in compliance with the License. You may obtain a copy
+of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+This product bundles or depends on the following open-source projects.
+Each retains its own license; see the upstream project for full terms.
+
+Backend (Python):
+- FastAPI                      MIT
+- Starlette                    BSD-3-Clause
+- Pydantic                     MIT
+- SQLAlchemy                   MIT
+- Alembic                      MIT
+- Uvicorn                      BSD-3-Clause
+- APScheduler                  MIT
+- aiosqlite                    MIT
+- aiomysql                     MIT
+- asyncpg                      Apache-2.0
+- pymssql                      LGPL-2.1
+- httpx                        BSD-3-Clause
+- bcrypt                       Apache-2.0
+- cryptography                 Apache-2.0 OR BSD-3-Clause
+- openai                       Apache-2.0
+
+Frontend (Node):
+- React                        MIT
+- Vite                         MIT
+- @reduxjs/toolkit             MIT
+- lucide-react                 ISC
+- TailwindCSS                  MIT
+- TypeScript                   Apache-2.0
+
+Connector brand names and logos are trademarks of their respective owners.
+Their use here is for identification and interoperability only and does not
+imply endorsement.
+
+Some connector icons are sourced from the Simple Icons project. Simple Icons
+is licensed under CC0 1.0 Universal. See https://simpleicons.org/.

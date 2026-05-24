@@ -1,0 +1,22 @@
+name: integration-full
+
+on:
+  workflow_dispatch:
+
+jobs:
+  integration-full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      DATACLAW_FULL_STACK_RELEASE_GATE: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: make install
+      - name: Run full integration gate
+        run: make test-integration-full

@@ -1,0 +1,38 @@
+{
+  "workspace": {
+    "name": "dataclaw-phase-h",
+    "connections": [
+      {
+        "name": "postgres_to_s3",
+        "status": "active",
+        "source": "integration_postgres",
+        "destination": "local_s3",
+        "streams": ["core.customers", "core.orders", "marketing.campaigns"],
+        "expected_result": "success",
+        "last_job": {
+          "id": 101,
+          "status": "succeeded",
+          "log_lines": ["read 10000 customers", "read 50000 orders", "wrote parquet files"]
+        }
+      },
+      {
+        "name": "failing_api_to_postgres",
+        "status": "failed",
+        "source": "failing_api",
+        "destination": "integration_postgres",
+        "streams": ["events.product_events"],
+        "expected_result": "failure",
+        "error": "seeded Phase H Airbyte failure: source API returned malformed JSON",
+        "last_job": {
+          "id": 102,
+          "status": "failed",
+          "log_lines": [
+            "GET /v1/events returned HTTP 200",
+            "JSON parser failed at byte 381: trailing comma",
+            "seeded Phase H Airbyte failure: source API returned malformed JSON"
+          ]
+        }
+      }
+    ]
+  }
+}

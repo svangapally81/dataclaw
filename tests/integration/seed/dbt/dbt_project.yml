@@ -1,0 +1,10 @@
+name: dataclaw_phase_h
+version: "1.0"
+profile: dataclaw_phase_h
+model-paths: ["models"]
+models:
+  dataclaw_phase_h:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

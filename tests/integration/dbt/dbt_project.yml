@@ -1,0 +1,14 @@
+name: dataclaw
+version: "1.0"
+config-version: 2
+profile: dataclaw
+
+model-paths: ["models"]
+
+models:
+  dataclaw:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+

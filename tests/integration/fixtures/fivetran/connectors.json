@@ -1,0 +1,55 @@
+{
+  "data": {
+    "items": [
+      {
+        "id": "postgres_to_warehouse",
+        "service": "postgres",
+        "schema": "core",
+        "status": {
+          "setup_state": "connected",
+          "sync_state": "scheduled",
+          "tasks": [],
+          "warnings": []
+        },
+        "succeeded_at": "2026-05-12T00:00:00Z",
+        "failed_at": null
+      },
+      {
+        "id": "salesforce_to_warehouse",
+        "service": "salesforce",
+        "schema": "salesforce",
+        "status": {
+          "setup_state": "connected",
+          "sync_state": "paused",
+          "tasks": [
+            {
+              "code": "schema_change_required",
+              "message": "Field Opportunity.Region__c requires approval before sync resumes"
+            }
+          ],
+          "warnings": []
+        },
+        "succeeded_at": "2026-05-11T22:00:00Z",
+        "failed_at": "2026-05-12T00:15:00Z"
+      },
+      {
+        "id": "stripe_to_warehouse",
+        "service": "stripe",
+        "schema": "billing",
+        "status": {
+          "setup_state": "connected",
+          "sync_state": "syncing",
+          "tasks": [],
+          "warnings": [
+            {
+              "code": "delayed_webhooks",
+              "message": "Webhook delivery is 18 minutes behind"
+            }
+          ]
+        },
+        "succeeded_at": "2026-05-12T00:10:00Z",
+        "failed_at": null
+      }
+    ]
+  }
+}
