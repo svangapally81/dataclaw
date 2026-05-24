@@ -1,0 +1,66 @@
+{
+  "jobs": [
+    {
+      "job_id": 42,
+      "creator_user_name": "data-eng@dataclaw.test",
+      "settings": {
+        "name": "daily_customer_features",
+        "tasks": [
+          {
+            "task_key": "refresh_customer_features",
+            "notebook_task": {
+              "notebook_path": "/Repos/data/customer_features"
+            }
+          }
+        ],
+        "schedule": {
+          "quartz_cron_expression": "0 0 5 * * ?",
+          "timezone_id": "UTC"
+        }
+      },
+      "created_time": 1778544000000
+    },
+    {
+      "job_id": 43,
+      "creator_user_name": "ml@dataclaw.test",
+      "settings": {
+        "name": "hourly_churn_scoring",
+        "tasks": [
+          {
+            "task_key": "score_churn",
+            "spark_python_task": {
+              "python_file": "dbfs:/jobs/churn_score.py"
+            }
+          }
+        ]
+      },
+      "created_time": 1778547600000
+    },
+    {
+      "job_id": 44,
+      "creator_user_name": "data-eng@dataclaw.test",
+      "settings": {
+        "name": "failing_product_event_load",
+        "tasks": [
+          {
+            "task_key": "load_product_events",
+            "sql_task": {
+              "query": {
+                "query_id": "event-load-query"
+              }
+            }
+          }
+        ]
+      },
+      "created_time": 1778551200000,
+      "latest_run": {
+        "run_id": 44001,
+        "state": {
+          "life_cycle_state": "TERMINATED",
+          "result_state": "FAILED",
+          "state_message": "Malformed JSON in product_events payload"
+        }
+      }
+    }
+  ]
+}

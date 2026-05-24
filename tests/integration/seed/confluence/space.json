@@ -1,0 +1,45 @@
+{
+  "space": "ENG",
+  "pages": [
+    {
+      "title": "Data Warehouse Architecture",
+      "body": "Core warehouse tables live in core.customers, core.orders, core.products, marketing.campaigns, and events.product_events. The customer 360 mart is refreshed by daily_etl and checked by dbt tests."
+    },
+    {
+      "title": "On-call Runbook",
+      "body": "For Snowflake outages, pause downstream dbt jobs and notify analytics-eng@dataclaw.com."
+    },
+    {
+      "title": "Glossary",
+      "body": "LTV is lifetime revenue minus refunds and support adjustment."
+    },
+    {
+      "title": "Snowflake Outage Procedure",
+      "body": "Declare SEV2, pause Airflow daily_etl and dbt production jobs, pin dashboards to the latest successful customer_360 snapshot, and record recovery notes in ENG."
+    },
+    {
+      "title": "dbt Ownership Map",
+      "body": "stg_customers feeds int_customer_orders, int_customer_activity, dim_customers, and fct_revenue_daily. Analytics engineering owns tests and exposures."
+    },
+    {
+      "title": "Airbyte Failure Playbook",
+      "body": "If failing_api_to_postgres reports malformed JSON, capture job logs, disable the connection, and page the source API owner."
+    },
+    {
+      "title": "Dagster Asset Catalog",
+      "body": "core_customers and core_orders are in core_assets; campaign_spend is in marketing_assets; daily_revenue_snapshot is partitioned daily."
+    },
+    {
+      "title": "Prefect Runbook",
+      "body": "failing_flow should surface warehouse timeout text. daily_sync is safe to rerun after checking duplicate guards."
+    },
+    {
+      "title": "GitHub Review Policy",
+      "body": "The data-warehouse repository keeps two open PRs for Phase H: Fix customer 360 freshness and Document payments reconciliation."
+    },
+    {
+      "title": "Data Quality SLAs",
+      "body": "core.orders must refresh hourly, derived.customer_360 must refresh weekly, and marketing.email_sends must load within 30 minutes."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "threads": [
+    {
+      "id": "thread_oncall",
+      "title": "On-call Runbook",
+      "updated_usec": 1778544000000000,
+      "link": "https://quip.example/thread_oncall",
+      "author_id": "user_data_platform"
+    },
+    {
+      "id": "thread_incident",
+      "title": "Malformed Product Events Incident",
+      "updated_usec": 1778545200000000,
+      "link": "https://quip.example/thread_incident",
+      "author_id": "user_data_platform"
+    },
+    {
+      "id": "thread_migration",
+      "title": "Snowflake to Databricks Migration Notes",
+      "updated_usec": 1778546400000000,
+      "link": "https://quip.example/thread_migration",
+      "author_id": "user_analytics"
+    }
+  ]
+}
