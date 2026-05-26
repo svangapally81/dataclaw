@@ -4,11 +4,11 @@ All notable changes to DataClaw are documented here. Format follows [Keep a Chan
 
 ## 0.1.0 - initial release
 
-The first public DataClaw release. Install from source (`git clone` + `make quickstart`) or `docker compose up -d` brings up the full product runtime: API, bundled UI, in-process worker, embedded persistent Chroma, and a seeded SQLite app DB. The `pipx install dataclaw-platform` path ships with the v0.1.0 tag (PyPI publish pending).
+The first public DataClaw release. A single `pipx install dataclaw-platform && dataclaw init && dataclaw start` brings up the full product runtime: API, bundled UI, in-process worker, embedded persistent Chroma, and a seeded SQLite app DB. Docker Compose remains the path for multi-container deployments.
 
 ### Highlights
 
-- **Single wheel ships everything.** Bundled frontend, alembic migrations, and the full connector catalog. No source tree or Node required on the host once installed.
+- **Pipx is the headline path.** Wheel ships the bundled frontend, alembic migrations, and the full connector catalog. No source tree or Node required on the host.
 - **Single root Dockerfile.** Builds the React frontend then a Python runtime with `dataclaw` on `$PATH`. Compose uses the same image for API + worker; embedded mode is just the same code with `DATACLAW_EMBEDDED_WORKER=true` and `CHROMA_URL` unset.
 - **Embedded Chroma.** Persistent client at `~/.dataclaw/chroma/` by default. Compose still runs a dedicated `chroma` service when `CHROMA_URL` is set.
 - **Auth-disabled by default for local installs.** Hosted deployments flip `DATACLAW_AUTH_DISABLED=false` and configure `ADMIN_EMAIL` / `ADMIN_PASSWORD`.

@@ -2,11 +2,12 @@
 
 This package installs the DataClaw FastAPI backend, bundled UI assets, and the `dataclaw` CLI.
 
-After installation:
-
 ```bash
+pipx install dataclaw-platform
 dataclaw init
 dataclaw start
 ```
 
-Source repo and Docker Compose path: <https://github.com/saivangapally81/dataclaw>
+Use Docker Compose from the repository root for the production-style local stack with a dedicated Chroma service and separate worker container.
+
+Source repo: <https://github.com/saivangapally81/dataclaw>

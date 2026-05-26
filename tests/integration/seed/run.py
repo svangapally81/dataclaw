@@ -176,8 +176,8 @@ def _load_bigquery_table(
     table: object,
 ) -> None:
     endpoint = api_endpoint.rstrip("/")
-    dataset = str(getattr(table, "dataset"))
-    table_name = str(getattr(table, "table"))
+    dataset = str(table.dataset)
+    table_name = str(table.table)
     try:
         _bigquery_api_request(
             "POST",
@@ -378,11 +378,33 @@ def seed_airflow(*, dag_id: str = AIRFLOW_FAILURE_DAG_ID, wait_seconds: int = 24
     print(f"[seed-airflow] DAG {dag_id} run {run_id} did not reach terminal state in {wait_seconds}s.", file=sys.stderr)
 
 
+def _bigquery_emulator_reachable(endpoint: str, *, timeout: float = 3.0) -> bool:
+    """Quick reachability probe so seed_bigquery() can skip cleanly when the
+    emulator container isn't running, instead of stalling 60s per request.
+    """
+    request = urllib.request.Request(
+        f"{endpoint.rstrip('/')}/discovery/v1/apis/bigquery/v2/rest",
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return response.status < 500
+    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, OSError):
+        return False
+
+
 def seed_bigquery(*, seed_date: str | None = None, api_endpoint: str | None = None) -> None:
+    endpoint = (api_endpoint or BIGQUERY_EMULATOR_API).rstrip("/")
+    if not _bigquery_emulator_reachable(endpoint):
+        print(
+            f"[seed-bigquery] BigQuery emulator at {endpoint} is not reachable; "
+            "skipping. Start it via the integration compose or pass --skip-bigquery.",
+            file=sys.stderr,
+        )
+        return
     bigquery_seed = _load_bigquery_seed_module()
     data_dir = REPO_ROOT / BIGQUERY_DATA_DIR
     bigquery_seed.write_seed_files(data_dir, seed_date=_parse_seed_date(seed_date))
-    endpoint = (api_endpoint or BIGQUERY_EMULATOR_API).rstrip("/")
     for table in bigquery_seed.TABLES:
         _load_bigquery_table(api_endpoint=endpoint, project_id=BIGQUERY_PROJECT_ID, data_dir=data_dir, table=table)
 
@@ -406,12 +428,17 @@ def main() -> int:
         action="store_true",
         help="Skip triggering the always-failing Airflow DAG (e.g., when the Airflow service is not running).",
     )
+    parser.add_argument(
+        "--skip-bigquery",
+        action="store_true",
+        help="Skip seeding the BigQuery emulator (e.g., when the bigquery container is not running).",
+    )
     args = parser.parse_args()
     if args.only in {"all", "sql"}:
         seed_sql()
     if args.only in {"all", "sql_server"}:
         seed_sql_server()
-    if args.only in {"all", "bigquery"}:
+    if args.only in {"all", "bigquery"} and not args.skip_bigquery:
         seed_bigquery(seed_date=args.seed_date, api_endpoint=args.bigquery_api or None)
     if args.only in {"all", "airflow"} and not args.skip_airflow:
         seed_airflow()

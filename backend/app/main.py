@@ -608,12 +608,17 @@ async def read_connector(
     session: AsyncSession = Depends(get_session),
     user: User = Depends(require_admin),
 ):
+    from cryptography.fernet import InvalidToken
+
     if slug not in CATALOG_BY_SLUG:
         raise HTTPException(status_code=404, detail="Unknown connector.")
     connector = await session.scalar(select(Connector).where(Connector.slug == slug))
     stored: dict = {}
     if connector and connector.encrypted_credentials:
-        stored = decrypt_json(get_settings().master_key, connector.encrypted_credentials)
+        try:
+            stored = decrypt_json(get_settings().master_key, connector.encrypted_credentials)
+        except InvalidToken:
+            stored = {}
     return _connector_summary(slug, stored)
 
 
@@ -624,15 +629,22 @@ async def test_connector(
     session: AsyncSession = Depends(get_session),
     user: User = Depends(require_admin),
 ):
+    from cryptography.fernet import InvalidToken
+
     if slug not in CATALOG_BY_SLUG:
         raise HTTPException(status_code=404, detail="Unknown connector.")
     connector = await session.scalar(select(Connector).where(Connector.slug == slug))
     credentials = dict(payload.credentials or {})
     if connector and connector.encrypted_credentials:
-        stored = decrypt_json(get_settings().master_key, connector.encrypted_credentials)
-        for key, value in stored.items():
-            if key not in credentials or credentials[key] in (None, ""):
-                credentials[key] = value
+        try:
+            stored = decrypt_json(get_settings().master_key, connector.encrypted_credentials)
+            for key, value in stored.items():
+                if key not in credentials or credentials[key] in (None, ""):
+                    credentials[key] = value
+        except InvalidToken:
+            # Old credentials encrypted with a different MASTER_KEY: ignore so
+            # the user can re-enter fresh values via this Test call.
+            pass
     payload.credentials = credentials
     try:
         result = await adapter_for(slug).test(credentials)
@@ -660,12 +672,26 @@ async def test_connector(
 
 @app.post("/connectors/{slug}/sync")
 async def sync_connector(slug: str, session: AsyncSession = Depends(get_session), user: User = Depends(require_admin)):
+    from cryptography.fernet import InvalidToken
+
     if slug not in CATALOG_BY_SLUG:
         raise HTTPException(status_code=404, detail="Unknown connector.")
     connector = await session.scalar(select(Connector).where(Connector.slug == slug))
     credentials: dict = {}
     if connector and connector.encrypted_credentials:
-        credentials = decrypt_json(settings.master_key, connector.encrypted_credentials)
+        try:
+            credentials = decrypt_json(settings.master_key, connector.encrypted_credentials)
+        except InvalidToken as exc:
+            connector.sync_state = "sync_failed"
+            connector.last_sync_error = (
+                "Stored credentials were encrypted with a different MASTER_KEY. "
+                "Click Configure to re-enter credentials, or restore the original MASTER_KEY."
+            )
+            await session.commit()
+            raise HTTPException(
+                status_code=409,
+                detail=connector.last_sync_error,
+            ) from exc
     if connector:
         claimed = await session.execute(
             update(Connector)

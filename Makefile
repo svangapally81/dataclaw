@@ -195,7 +195,7 @@ integration-e2e:
 		$(BACKEND_RUN) tests/integration/test_e2e_knowledge.py -v
 
 integration-seed:
-	python3 tests/integration/seed/run.py
+	cd backend && uv run --project . python ../tests/integration/seed/run.py
 
 acme-fixtures:
 	backend/.venv/bin/python tests/integration/acme/coverage/generate_fixtures.py

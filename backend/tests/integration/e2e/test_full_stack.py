@@ -1068,6 +1068,9 @@ def test_phase_h_seed_runner_wires_bigquery_loads(monkeypatch, tmp_path: Path) -
 
     monkeypatch.setattr(seed_runner, "BIGQUERY_DATA_DIR", tmp_path / "bigquery")
     monkeypatch.setattr(seed_runner, "_load_bigquery_seed_module", lambda: FakeBigQuerySeed)
+    # Bypass the reachability probe — the test exercises the wiring with the
+    # internals mocked, not real network calls to the emulator.
+    monkeypatch.setattr(seed_runner, "_bigquery_emulator_reachable", lambda endpoint, *, timeout=3.0: True)
     monkeypatch.setattr(
         seed_runner,
         "_load_bigquery_table",

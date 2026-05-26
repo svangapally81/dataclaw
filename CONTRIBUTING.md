@@ -14,7 +14,13 @@ Please do not paste secrets, API keys, customer data, private URLs, or proprieta
 
 ## Local Setup
 
-> `pipx install dataclaw-platform` from PyPI is pending. Until v0.1.0 is tagged + published, install from source as described below.
+Recommended install smoke:
+
+```bash
+pipx install dataclaw-platform
+dataclaw init
+dataclaw start
+```
 
 Source development:
 

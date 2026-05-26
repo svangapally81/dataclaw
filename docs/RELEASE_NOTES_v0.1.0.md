@@ -1,10 +1,18 @@
 # DataClaw v0.1.0 Release Notes
 
-First public release. Install from source or Docker Compose today; PyPI publish (`pipx install dataclaw-platform`) ships with the v0.1.0 tag.
+First public release. The whole product runs from one `pipx install`.
 
 ## Install
 
-### Docker Compose (fastest, no Python toolchain)
+```bash
+pipx install dataclaw-platform
+dataclaw init
+dataclaw start
+```
+
+Browser opens at `http://127.0.0.1:8000`. The SQLite demo connector is pre-configured with `customers / orders / products` tables.
+
+For multi-container deployments:
 
 ```bash
 git clone https://github.com/saivangapally81/dataclaw.git
@@ -18,21 +26,6 @@ python3 -c "import secrets; print('SESSION_SECRET=' + secrets.token_urlsafe(48))
 
 docker compose up -d
 ```
-
-### From source (Python + Node toolchain)
-
-```bash
-git clone https://github.com/saivangapally81/dataclaw.git
-cd dataclaw
-make install
-make quickstart
-```
-
-Either path opens the UI at `http://127.0.0.1:8000` (source) or `http://localhost:8000` (docker). The SQLite demo connector is pre-configured with `customers / orders / products` tables.
-
-### Coming with the v0.1.0 tag
-
-`pipx install dataclaw-platform` publishes to PyPI when the release workflow fires on the `v0.1.0` tag. Until then use one of the two paths above.
 
 ## What's in v0.1.0
 

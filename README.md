@@ -37,15 +37,28 @@ DataClaw is a self-hosted, AI-native data platform. Connect your warehouses, pip
 
 ## Quickstart
 
-> `pipx install dataclaw-platform` from PyPI is coming with the v0.1.0 tag. Until then, use one of the two paths below — both work today.
-
 ### Prerequisites
 
 - **Python 3.12+** (3.13 also fine)
-- **Docker Desktop** for the Docker Compose path
-- **Node 22+** + **`uv`** for the from-source path
+- **`pipx`** for the recommended install: `brew install pipx` on macOS, `python3 -m pip install --user pipx` elsewhere
+- **Docker Desktop** if you choose the Docker Compose path
+- **Node 22+** + **`uv`** only if you're developing from source
 
-### Path 1: Docker Compose (fastest, no Python toolchain needed)
+### Recommended: `pipx`
+
+```bash
+pipx install dataclaw-platform
+dataclaw init
+dataclaw start
+```
+
+`dataclaw init` generates a fresh `~/.dataclaw/.env` with a unique Fernet `MASTER_KEY` and session secret. It starts the bundled UI, FastAPI backend, embedded APScheduler worker, SQLite app database, demo SQLite database, and persistent Chroma under `~/.dataclaw/`. Auth is disabled by default so the UI opens straight to the workspace. For hosted deployments, flip `DATACLAW_AUTH_DISABLED=false` and configure `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
+
+> Note: the PyPI package is named `dataclaw-platform`; the CLI command is `dataclaw`.
+
+### Other install paths
+
+**Docker Compose** - multi-container deployment with a dedicated Chroma service and separate worker:
 
 ```bash
 git clone https://github.com/saivangapally81/dataclaw.git
@@ -62,18 +75,16 @@ docker compose up -d
 
 UI at `http://localhost:8000`. Stop with `docker compose down`.
 
-### Path 2: From source (Python toolchain)
+**From source** (contributors only):
 
 ```bash
 git clone https://github.com/saivangapally81/dataclaw.git
 cd dataclaw
 make install         # backend (uv sync) + frontend (npm ci)
-make quickstart      # bundle UI + dataclaw init + dataclaw start
+make dev             # starts backend + frontend (Vite :5173) + worker + ChromaDB
 ```
 
-`make quickstart` boots everything: bundled UI, FastAPI backend, embedded APScheduler worker, SQLite app database, demo SQLite database, persistent Chroma under `~/.dataclaw/`. Auth is disabled by default. For hosted deployments, flip `DATACLAW_AUTH_DISABLED=false` and configure `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
-
-For contributors iterating on the React UI: `make dev` runs backend + frontend (Vite dev server on `:5173`) + worker + ChromaDB.
+Use `make dev` when iterating on the React UI (hot reload). For a release-style local run from source, `make quickstart` is the equivalent of the pipx path.
 
 ### First-run checklist
 

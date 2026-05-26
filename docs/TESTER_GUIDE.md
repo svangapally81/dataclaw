@@ -111,16 +111,11 @@ Use a **fresh machine or fresh user account** if you can, so you're not relying 
 
 For each path below, follow the docs literally - `README.md` + [getdataclaw.xyz/docs/quickstart](https://getdataclaw.xyz/docs/quickstart). **If the docs are missing a step you needed, that's a bug.**
 
-### Path A - pipx from a locally-built wheel
-
-PyPI publish ships with the v0.1.0 tag. Until then, test the pipx path against the locally-built wheel - same bytes that PyPI will receive.
+### Path A - pipx (CLI install)
 
 ```bash
-git clone https://github.com/saivangapally81/dataclaw.git
-cd dataclaw
-make install
-make wheel
-pipx install backend/dist/dataclaw_platform-0.1.0-py3-none-any.whl
+pipx install dataclaw-platform==0.1.0
+# Or from a locally-built wheel: pipx install backend/dist/dataclaw_platform-0.1.0-py3-none-any.whl
 dataclaw init
 dataclaw start
 ```
