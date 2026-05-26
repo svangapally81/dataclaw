@@ -406,13 +406,26 @@ def main() -> int:
         action="store_true",
         help="Skip triggering the always-failing Airflow DAG (e.g., when the Airflow service is not running).",
     )
+    parser.add_argument(
+        "--skip-bigquery",
+        action="store_true",
+        help="Skip the BigQuery emulator load (useful when the emulator is unreachable).",
+    )
     args = parser.parse_args()
     if args.only in {"all", "sql"}:
         seed_sql()
     if args.only in {"all", "sql_server"}:
         seed_sql_server()
-    if args.only in {"all", "bigquery"}:
-        seed_bigquery(seed_date=args.seed_date, api_endpoint=args.bigquery_api or None)
+    if args.only in {"all", "bigquery"} and not args.skip_bigquery:
+        try:
+            seed_bigquery(seed_date=args.seed_date, api_endpoint=args.bigquery_api or None)
+        except (TimeoutError, urllib.error.URLError, OSError) as exc:
+            # BigQuery emulator hangs are a known fixture flake; don't let it
+            # block the rest of seeding (SQL / SQL Server / Airflow still run).
+            print(
+                f"[seed-bigquery] skipped — emulator unreachable: {exc.__class__.__name__}: {exc}",
+                file=sys.stderr,
+            )
     if args.only in {"all", "airflow"} and not args.skip_airflow:
         seed_airflow()
     return 0
