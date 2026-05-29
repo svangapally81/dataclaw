@@ -35,6 +35,16 @@ DataClaw is a self-hosted, AI-native data platform. Connect your warehouses, pip
 - **Write safety + audit** - destructive SQL creates approval-required alerts; every executed write logged in `agent_write_audit`.
 - **Self-hosted, open-source** - runs on your laptop, your VPS, or your VPC. No data leaves your network.
 
+## 🎥 Demo
+
+<div align="center">
+  <a href="https://youtu.be/YCmWXT2Zgio">
+    <img src="https://img.youtube.com/vi/YCmWXT2Zgio/maxresdefault.jpg" alt="DataClaw Demo" width="900">
+  </a>
+  <br/>
+  <a href="https://youtu.be/YCmWXT2Zgio"><strong>▶ Watch the DataClaw Demo</strong></a>
+</div>
+
 ## Quickstart
 
 ### Prerequisites
