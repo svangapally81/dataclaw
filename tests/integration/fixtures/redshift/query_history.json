@@ -1,0 +1,41 @@
+{
+  "queries": [
+    {
+      "query": 1001,
+      "database": "analytics",
+      "schema": "core",
+      "user_name": "dataclaw",
+      "query_text": "select count(*) from core.orders where placed_at >= getdate() - interval '30 days'",
+      "status": "finished",
+      "start_time": "2026-05-12T00:00:00Z",
+      "elapsed_ms": 311,
+      "rows": 1,
+      "service_class": "short_query"
+    },
+    {
+      "query": 1002,
+      "database": "analytics",
+      "schema": "marketing",
+      "user_name": "looker",
+      "query_text": "select platform, sum(budget_usd) from marketing.campaigns group by platform",
+      "status": "finished",
+      "start_time": "2026-05-12T00:03:00Z",
+      "elapsed_ms": 874,
+      "rows": 5,
+      "service_class": "dashboard"
+    },
+    {
+      "query": 1003,
+      "database": "analytics",
+      "schema": "events",
+      "user_name": "airbyte",
+      "query_text": "copy events.product_events from 's3://dataclaw-fixtures/events/' iam_role default format as json 'auto'",
+      "status": "failed",
+      "error": "Invalid JSONPath format at line 3201",
+      "start_time": "2026-05-12T00:08:00Z",
+      "elapsed_ms": 1204,
+      "rows": 0,
+      "service_class": "load"
+    }
+  ]
+}

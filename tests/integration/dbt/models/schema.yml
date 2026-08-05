@@ -1,0 +1,23 @@
+version: 2
+
+sources:
+  - name: raw
+    tables:
+      - name: orders
+      - name: customers
+
+models:
+  - name: stg_orders
+    columns:
+      - name: order_id
+        tests: [not_null, unique]
+      - name: customer_id
+        tests: [not_null]
+  - name: dim_customers
+    columns:
+      - name: customer_id
+        tests: [not_null, unique]
+  - name: fct_revenue_daily
+    columns:
+      - name: ordered_day
+        tests: [not_null]

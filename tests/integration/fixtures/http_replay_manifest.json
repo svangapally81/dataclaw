@@ -1,0 +1,46 @@
+{
+  "routes": [
+    {
+      "connector": "snowflake",
+      "method": "GET",
+      "url": "https://fixture.snowflake.local/api/v2/query-history",
+      "fixture": "snowflake/query_history.json"
+    },
+    {
+      "connector": "redshift",
+      "method": "GET",
+      "url": "https://fixture.redshift.local/query-history",
+      "fixture": "redshift/query_history.json"
+    },
+    {
+      "connector": "databricks",
+      "method": "GET",
+      "url": "https://fixture.databricks.local/api/2.1/jobs/list",
+      "fixture": "databricks/jobs_list.json"
+    },
+    {
+      "connector": "fivetran",
+      "method": "GET",
+      "url": "https://api.fivetran.com/v1/connectors",
+      "fixture": "fivetran/connectors.json"
+    },
+    {
+      "connector": "notion",
+      "method": "POST",
+      "url": "https://api.notion.com/v1/search",
+      "fixture": "notion/search_pages.json"
+    },
+    {
+      "connector": "google_docs",
+      "method": "GET",
+      "url": "https://www.googleapis.com/drive/v3/files",
+      "fixture": "google_docs/documents.json"
+    },
+    {
+      "connector": "quip",
+      "method": "GET",
+      "url": "https://platform.quip.com/1/threads/recent",
+      "fixture": "quip/threads.json"
+    }
+  ]
+}

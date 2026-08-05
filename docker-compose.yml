@@ -1,0 +1,56 @@
+services:
+  chroma:
+    image: chromadb/chroma:1.5.9
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma-data:/chroma/chroma
+
+  backend-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: start --host 0.0.0.0 --port 8000 --no-browser --foreground
+    # Load user-provided secrets (MASTER_KEY, SESSION_SECRET, OPENAI_API_KEY, etc.)
+    # from .env at the repo root. Overridden by anything in `environment:` below.
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:////data/dataclaw.sqlite
+      DEMO_DATABASE_URL: sqlite+aiosqlite:////data/dataclaw_demo.sqlite
+      CHROMA_URL: http://chroma:8000
+      CORS_ORIGINS: http://localhost:8000,http://127.0.0.1:8000
+      DATACLAW_HOME: /data
+      DATACLAW_EMBEDDED_WORKER: "false"
+      DEMO_MODE: "true"
+    volumes:
+      - app-data:/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      - chroma
+
+  backend-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    entrypoint: ["python", "-m", "app.worker.main"]
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:////data/dataclaw.sqlite
+      DEMO_DATABASE_URL: sqlite+aiosqlite:////data/dataclaw_demo.sqlite
+      CHROMA_URL: http://chroma:8000
+      DATACLAW_HOME: /data
+      DEMO_MODE: "true"
+    volumes:
+      - app-data:/data
+    depends_on:
+      - backend-api
+      - chroma
+
+volumes:
+  app-data:
+  chroma-data:

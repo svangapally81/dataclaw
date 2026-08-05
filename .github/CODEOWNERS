@@ -1,0 +1,18 @@
+# Default: maintainers review everything that doesn't match a more specific rule.
+* @dataclaw/maintainers
+
+# Backend services
+/backend/app/services/connectors/   @dataclaw/connector-team
+/backend/app/services/agents/       @dataclaw/agents-team
+
+# Schema migrations are load-bearing — require explicit review.
+/backend/app/alembic/versions/      @dataclaw/maintainers @dataclaw/database
+
+# Security policy + dependency files
+/SECURITY.md                        @dataclaw/security
+/CONTRIBUTING.md                    @dataclaw/maintainers
+/.github/                           @dataclaw/maintainers
+/backend/pyproject.toml             @dataclaw/maintainers
+/backend/uv.lock                    @dataclaw/maintainers
+/frontend/package.json              @dataclaw/maintainers
+/frontend/package-lock.json         @dataclaw/maintainers

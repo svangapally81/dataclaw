@@ -1,0 +1,40 @@
+{
+  "files": [
+    {
+      "id": "doc_architecture",
+      "name": "Warehouse Architecture",
+      "mimeType": "application/vnd.google-apps.document",
+      "modifiedTime": "2026-05-12T00:00:00Z",
+      "webViewLink": "https://docs.example/warehouse-architecture",
+      "owners": [
+        {
+          "emailAddress": "data-eng@dataclaw.test"
+        }
+      ]
+    },
+    {
+      "id": "doc_sla",
+      "name": "Data Quality SLAs",
+      "mimeType": "application/vnd.google-apps.document",
+      "modifiedTime": "2026-05-12T00:05:00Z",
+      "webViewLink": "https://docs.example/data-quality-slas",
+      "owners": [
+        {
+          "emailAddress": "analytics@dataclaw.test"
+        }
+      ]
+    },
+    {
+      "id": "sheet_lineage",
+      "name": "Marketing Attribution Lineage",
+      "mimeType": "application/vnd.google-apps.spreadsheet",
+      "modifiedTime": "2026-05-12T00:10:00Z",
+      "webViewLink": "https://docs.example/marketing-attribution-lineage",
+      "owners": [
+        {
+          "emailAddress": "marketing-ops@dataclaw.test"
+        }
+      ]
+    }
+  ]
+}

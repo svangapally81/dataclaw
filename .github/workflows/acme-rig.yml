@@ -1,0 +1,501 @@
+name: acme-rig
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "tests/integration/**"
+      - "scripts/**"
+      - "Dockerfile"
+      - "docker-compose.yml"
+      - ".github/workflows/acme-rig.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "tests/integration/**"
+      - "scripts/**"
+      - "Dockerfile"
+      - "docker-compose.yml"
+      - ".github/workflows/acme-rig.yml"
+  workflow_dispatch:
+    inputs:
+      notion_parent_page_id:
+        description: "Notion parent page ID for Acme test pages"
+        required: false
+        type: string
+      github_test_repo:
+        description: "Sandbox repo for Acme GitHub/dbt fixtures, e.g. owner/dataclaw-acme-dbt"
+        required: false
+        type: string
+      confluence_space_key:
+        description: "Confluence space key for Acme test pages"
+        required: false
+        type: string
+      snowflake_warehouse:
+        description: "Snowflake warehouse for Acme coverage queries"
+        required: false
+        type: string
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: acme-rig-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Acme live configuration
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NOTION_INTEGRATION_TOKEN: ${{ secrets.NOTION_INTEGRATION_TOKEN }}
+          NOTION_TEST_PARENT_PAGE_ID: ${{ secrets.NOTION_TEST_PARENT_PAGE_ID || inputs.notion_parent_page_id }}
+          GITHUB_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          GITHUB_TEST_REPO: ${{ secrets.GH_TEST_REPO || inputs.github_test_repo || format('{0}/{1}', github.repository_owner, secrets.ACME_GITHUB_REPO_NAME || 'dataclaw-acme-dbt') }}
+          CONFLUENCE_SITE_URL: ${{ secrets.CONFLUENCE_SITE_URL }}
+          CONFLUENCE_EMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
+          CONFLUENCE_API_TOKEN: ${{ secrets.CONFLUENCE_API_TOKEN || secrets.CONFLUENCE_API_BASIC_AUTH_TOKEN || secrets.CONFLUENCE_API_OAUTH_TOKEN }}
+          CONFLUENCE_SPACE_KEY: ${{ secrets.CONFLUENCE_SPACE_KEY || inputs.confluence_space_key || 'ACME' }}
+          BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
+          BIGQUERY_PROJECT_ID: ${{ secrets.BIGQUERY_PROJECT_ID }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE || inputs.snowflake_warehouse || 'COMPUTE_WH' }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+          DATABRICKS_WORKSPACE_URL: ${{ secrets.DATABRICKS_WORKSPACE_URL || secrets.DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          REDSHIFT_CLUSTER_ENDPOINT: ${{ secrets.REDSHIFT_CLUSTER_ENDPOINT || secrets.REDSHIFT_ENDPOINT }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_USER }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_PASSWORD }}
+          FIVETRAN_API_KEY: ${{ secrets.FIVETRAN_API_KEY }}
+          FIVETRAN_API_SECRET: ${{ secrets.FIVETRAN_API_SECRET }}
+          FIVETRAN_CONNECTOR_ID: ${{ secrets.FIVETRAN_CONNECTOR_ID }}
+        run: |
+          missing=()
+          require() {
+            local name="$1"
+            if [ -z "${!name:-}" ]; then
+              missing+=("$name")
+            fi
+          }
+          require OPENAI_API_KEY
+          require NOTION_INTEGRATION_TOKEN
+          require NOTION_TEST_PARENT_PAGE_ID
+          require GITHUB_TEST_TOKEN
+          require GITHUB_TEST_REPO
+          require CONFLUENCE_SITE_URL
+          require CONFLUENCE_EMAIL
+          require CONFLUENCE_SPACE_KEY
+          require CONFLUENCE_API_TOKEN
+          require BIGQUERY_SERVICE_ACCOUNT_JSON
+          require BIGQUERY_PROJECT_ID
+          require SNOWFLAKE_ACCOUNT
+          require SNOWFLAKE_USER
+          require DATABRICKS_WORKSPACE_URL
+          require DATABRICKS_HTTP_PATH
+          require DATABRICKS_TOKEN
+          require REDSHIFT_CLUSTER_ENDPOINT
+          require REDSHIFT_USER
+          require REDSHIFT_PASSWORD
+          require FIVETRAN_API_KEY
+          require FIVETRAN_API_SECRET
+          if [ -z "${SNOWFLAKE_PASSWORD:-}" ] && [ -z "${SNOWFLAKE_PRIVATE_KEY:-}" ]; then
+            missing+=("SNOWFLAKE_PASSWORD or SNOWFLAKE_PRIVATE_KEY")
+          fi
+          if [ "${#missing[@]}" -gt 0 ]; then
+            printf 'Missing Acme live configuration:\n' >&2
+            printf -- '- %s\n' "${missing[@]}" >&2
+            exit 1
+          fi
+
+  seed:
+    needs: preflight
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: make install
+      - name: Seed Acme manifest
+        run: make acme-seed BOOT_CONTAINERS=1 REQUIRE_LIVE=1
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NOTION_INTEGRATION_TOKEN: ${{ secrets.NOTION_INTEGRATION_TOKEN }}
+          NOTION_TEST_PARENT_PAGE_ID: ${{ secrets.NOTION_TEST_PARENT_PAGE_ID || inputs.notion_parent_page_id }}
+          NOTION_TEST_DATABASE_IDS: ${{ secrets.NOTION_TEST_DATABASE_IDS }}
+          GITHUB_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          GH_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          GH_TEST_REPO: ${{ secrets.GH_TEST_REPO }}
+          GITHUB_TEST_REPO: ${{ secrets.GH_TEST_REPO || inputs.github_test_repo || format('{0}/{1}', github.repository_owner, secrets.ACME_GITHUB_REPO_NAME || 'dataclaw-acme-dbt') }}
+          ACME_GITHUB_REPO_NAME: ${{ secrets.ACME_GITHUB_REPO_NAME || 'dataclaw-acme-dbt' }}
+          ACME_GITHUB_WORKFLOW_RUN_ID: ${{ github.run_id }}
+          CONFLUENCE_SITE_URL: ${{ secrets.CONFLUENCE_SITE_URL }}
+          CONFLUENCE_EMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
+          CONFLUENCE_API_TOKEN: ${{ secrets.CONFLUENCE_API_TOKEN }}
+          CONFLUENCE_API_BASIC_AUTH_TOKEN: ${{ secrets.CONFLUENCE_API_BASIC_AUTH_TOKEN }}
+          CONFLUENCE_API_OAUTH_TOKEN: ${{ secrets.CONFLUENCE_API_OAUTH_TOKEN }}
+          CONFLUENCE_SPACE_KEY: ${{ secrets.CONFLUENCE_SPACE_KEY || inputs.confluence_space_key || 'ACME' }}
+          BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
+          BIGQUERY_PROJECT_ID: ${{ secrets.BIGQUERY_PROJECT_ID }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE || inputs.snowflake_warehouse || 'COMPUTE_WH' }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+          SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
+          DATABRICKS_WORKSPACE_URL: ${{ secrets.DATABRICKS_WORKSPACE_URL }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          REDSHIFT_CLUSTER_ENDPOINT: ${{ secrets.REDSHIFT_CLUSTER_ENDPOINT }}
+          REDSHIFT_ENDPOINT: ${{ secrets.REDSHIFT_ENDPOINT }}
+          REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_DATABASE }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_USER }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_PASSWORD }}
+          FIVETRAN_API_KEY: ${{ secrets.FIVETRAN_API_KEY }}
+          FIVETRAN_API_SECRET: ${{ secrets.FIVETRAN_API_SECRET }}
+          FIVETRAN_CONNECTOR_ID: ${{ secrets.FIVETRAN_CONNECTOR_ID }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: acme-ids
+          path: tests/integration/acme/seed/acme_ids.json
+
+  coverage:
+    needs: seed
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        connector:
+          - notion
+          - github
+          - confluence
+          - bigquery
+          - snowflake
+          - databricks
+          - redshift
+          - fivetran
+          - postgres
+          - mysql
+          - sql_server
+          - trino
+          - airflow
+          - dbt
+          - prefect
+          - dagster
+          - airbyte
+          - sqlite
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: acme-ids
+          path: tests/integration/acme/seed/
+      - run: cd backend && uv sync --all-extras
+      - name: Verify Acme fixture/catalog parity
+        run: |
+          cd backend
+          uv run python -m pytest ../tests/integration/acme/coverage/test_mcp_tool_coverage.py::test_fixtures_cover_all_catalog_tools -v
+      - name: Boot Acme local services
+        run: docker compose -f tests/integration/docker-compose.yml up -d --wait postgres mysql sql_server trino airflow fixture-api dbt prefect dagster chroma
+      - name: Seed Acme local services
+        run: make acme-seed CONTAINERS_ONLY=1
+      - name: Validate MCP fixture coverage
+        run: |
+          cd backend
+          uv run --with pytest-json-report python -m pytest ../tests/integration/acme/coverage -v \
+            --json-report --json-report-file="../coverage-${{ matrix.connector }}.json"
+        env:
+          ACME_COVERAGE_CONNECTOR: ${{ matrix.connector }}
+          RUN_ACME_MCP_COVERAGE: "1"
+          ACME_COVERAGE_RESULTS_FILE: ../coverage-live-${{ matrix.connector }}.json
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NOTION_INTEGRATION_TOKEN: ${{ secrets.NOTION_INTEGRATION_TOKEN }}
+          NOTION_TEST_PARENT_PAGE_ID: ${{ secrets.NOTION_TEST_PARENT_PAGE_ID || inputs.notion_parent_page_id }}
+          NOTION_TEST_DATABASE_IDS: ${{ secrets.NOTION_TEST_DATABASE_IDS }}
+          GITHUB_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          GH_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          GH_TEST_REPO: ${{ secrets.GH_TEST_REPO }}
+          GITHUB_TEST_REPO: ${{ secrets.GH_TEST_REPO || inputs.github_test_repo || format('{0}/{1}', github.repository_owner, secrets.ACME_GITHUB_REPO_NAME || 'dataclaw-acme-dbt') }}
+          ACME_GITHUB_WORKFLOW_RUN_ID: ${{ github.run_id }}
+          CONFLUENCE_SITE_URL: ${{ secrets.CONFLUENCE_SITE_URL }}
+          CONFLUENCE_EMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
+          CONFLUENCE_API_TOKEN: ${{ secrets.CONFLUENCE_API_TOKEN }}
+          CONFLUENCE_API_BASIC_AUTH_TOKEN: ${{ secrets.CONFLUENCE_API_BASIC_AUTH_TOKEN }}
+          CONFLUENCE_API_OAUTH_TOKEN: ${{ secrets.CONFLUENCE_API_OAUTH_TOKEN }}
+          CONFLUENCE_SPACE_KEY: ${{ secrets.CONFLUENCE_SPACE_KEY || inputs.confluence_space_key || 'ACME' }}
+          BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
+          BIGQUERY_PROJECT_ID: ${{ secrets.BIGQUERY_PROJECT_ID }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE || inputs.snowflake_warehouse || 'COMPUTE_WH' }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+          SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
+          DATABRICKS_WORKSPACE_URL: ${{ secrets.DATABRICKS_WORKSPACE_URL }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          REDSHIFT_CLUSTER_ENDPOINT: ${{ secrets.REDSHIFT_CLUSTER_ENDPOINT }}
+          REDSHIFT_ENDPOINT: ${{ secrets.REDSHIFT_ENDPOINT }}
+          REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_DATABASE }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_USER }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_PASSWORD }}
+          FIVETRAN_API_KEY: ${{ secrets.FIVETRAN_API_KEY }}
+          FIVETRAN_API_SECRET: ${{ secrets.FIVETRAN_API_SECRET }}
+          FIVETRAN_CONNECTOR_ID: ${{ secrets.FIVETRAN_CONNECTOR_ID }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.connector }}
+          path: |
+            coverage-${{ matrix.connector }}.json
+            coverage-live-${{ matrix.connector }}.json
+
+  chat-scenarios:
+    needs: [seed, compile-retrieval]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [1_docs, 2_bq, 3_prefect, 4_messy, 5_write]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: acme-ids
+          path: tests/integration/acme/seed/
+      - run: cd backend && uv sync --all-extras
+      - name: Boot Acme local services
+        run: docker compose -f tests/integration/docker-compose.yml up -d --wait postgres mysql sql_server trino airflow fixture-api dbt prefect dagster chroma
+      - name: Seed Acme local services
+        run: make acme-seed CONTAINERS_ONLY=1
+      - name: Run chat scenario
+        run: |
+          cd backend
+          uv run --with pytest-json-report python -m pytest ../tests/integration/acme/e2e/test_chat_scenario_${{ matrix.scenario }}.py -v \
+            --json-report --json-report-file="../chat-${{ matrix.scenario }}.json"
+        env:
+          RUN_ACME_E2E: "1"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NOTION_INTEGRATION_TOKEN: ${{ secrets.NOTION_INTEGRATION_TOKEN }}
+          NOTION_TEST_PARENT_PAGE_ID: ${{ secrets.NOTION_TEST_PARENT_PAGE_ID || inputs.notion_parent_page_id }}
+          NOTION_TEST_DATABASE_IDS: ${{ secrets.NOTION_TEST_DATABASE_IDS }}
+          GITHUB_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          GH_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          GH_TEST_REPO: ${{ secrets.GH_TEST_REPO }}
+          GITHUB_TEST_REPO: ${{ secrets.GH_TEST_REPO || inputs.github_test_repo || format('{0}/{1}', github.repository_owner, secrets.ACME_GITHUB_REPO_NAME || 'dataclaw-acme-dbt') }}
+          ACME_GITHUB_WORKFLOW_RUN_ID: ${{ github.run_id }}
+          CONFLUENCE_SITE_URL: ${{ secrets.CONFLUENCE_SITE_URL }}
+          CONFLUENCE_EMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
+          CONFLUENCE_API_TOKEN: ${{ secrets.CONFLUENCE_API_TOKEN }}
+          CONFLUENCE_API_BASIC_AUTH_TOKEN: ${{ secrets.CONFLUENCE_API_BASIC_AUTH_TOKEN }}
+          CONFLUENCE_API_OAUTH_TOKEN: ${{ secrets.CONFLUENCE_API_OAUTH_TOKEN }}
+          CONFLUENCE_SPACE_KEY: ${{ secrets.CONFLUENCE_SPACE_KEY || inputs.confluence_space_key || 'ACME' }}
+          BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
+          BIGQUERY_PROJECT_ID: ${{ secrets.BIGQUERY_PROJECT_ID }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE || inputs.snowflake_warehouse || 'COMPUTE_WH' }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+          SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
+          DATABRICKS_WORKSPACE_URL: ${{ secrets.DATABRICKS_WORKSPACE_URL }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          REDSHIFT_CLUSTER_ENDPOINT: ${{ secrets.REDSHIFT_CLUSTER_ENDPOINT }}
+          REDSHIFT_ENDPOINT: ${{ secrets.REDSHIFT_ENDPOINT }}
+          REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_DATABASE }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_USER }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_PASSWORD }}
+          FIVETRAN_API_KEY: ${{ secrets.FIVETRAN_API_KEY }}
+          FIVETRAN_API_SECRET: ${{ secrets.FIVETRAN_API_SECRET }}
+          FIVETRAN_CONNECTOR_ID: ${{ secrets.FIVETRAN_CONNECTOR_ID }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: chat-${{ matrix.scenario }}
+          path: chat-${{ matrix.scenario }}.json
+
+  compile-retrieval:
+    needs: seed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: acme-ids
+          path: tests/integration/acme/seed/
+      - run: cd backend && uv sync --all-extras
+      - name: Boot Acme local services
+        run: docker compose -f tests/integration/docker-compose.yml up -d --wait postgres mysql sql_server trino airflow fixture-api dbt prefect dagster chroma
+      - name: Seed Acme local services
+        run: make acme-seed CONTAINERS_ONLY=1
+      - name: Run compile/retrieval
+        run: |
+          cd backend
+          uv run --with pytest-json-report python -m pytest ../tests/integration/acme/e2e/test_compile_retrieval.py -v \
+            --json-report --json-report-file="../compile-retrieval.json"
+        env:
+          RUN_ACME_E2E: "1"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NOTION_INTEGRATION_TOKEN: ${{ secrets.NOTION_INTEGRATION_TOKEN }}
+          NOTION_TEST_PARENT_PAGE_ID: ${{ secrets.NOTION_TEST_PARENT_PAGE_ID || inputs.notion_parent_page_id }}
+          NOTION_TEST_DATABASE_IDS: ${{ secrets.NOTION_TEST_DATABASE_IDS }}
+          GITHUB_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          GH_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          GH_TEST_REPO: ${{ secrets.GH_TEST_REPO }}
+          GITHUB_TEST_REPO: ${{ secrets.GH_TEST_REPO || inputs.github_test_repo || format('{0}/{1}', github.repository_owner, secrets.ACME_GITHUB_REPO_NAME || 'dataclaw-acme-dbt') }}
+          ACME_GITHUB_WORKFLOW_RUN_ID: ${{ github.run_id }}
+          CONFLUENCE_SITE_URL: ${{ secrets.CONFLUENCE_SITE_URL }}
+          CONFLUENCE_EMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
+          CONFLUENCE_API_TOKEN: ${{ secrets.CONFLUENCE_API_TOKEN }}
+          CONFLUENCE_API_BASIC_AUTH_TOKEN: ${{ secrets.CONFLUENCE_API_BASIC_AUTH_TOKEN }}
+          CONFLUENCE_API_OAUTH_TOKEN: ${{ secrets.CONFLUENCE_API_OAUTH_TOKEN }}
+          CONFLUENCE_SPACE_KEY: ${{ secrets.CONFLUENCE_SPACE_KEY || inputs.confluence_space_key || 'ACME' }}
+          BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
+          BIGQUERY_PROJECT_ID: ${{ secrets.BIGQUERY_PROJECT_ID }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE || inputs.snowflake_warehouse || 'COMPUTE_WH' }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+          SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
+          DATABRICKS_WORKSPACE_URL: ${{ secrets.DATABRICKS_WORKSPACE_URL }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          REDSHIFT_CLUSTER_ENDPOINT: ${{ secrets.REDSHIFT_CLUSTER_ENDPOINT }}
+          REDSHIFT_ENDPOINT: ${{ secrets.REDSHIFT_ENDPOINT }}
+          REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_DATABASE }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_USER }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_PASSWORD }}
+          FIVETRAN_API_KEY: ${{ secrets.FIVETRAN_API_KEY }}
+          FIVETRAN_API_SECRET: ${{ secrets.FIVETRAN_API_SECRET }}
+          FIVETRAN_CONNECTOR_ID: ${{ secrets.FIVETRAN_CONNECTOR_ID }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: compile-retrieval
+          path: compile-retrieval.json
+
+  background-agents:
+    needs: [seed, compile-retrieval]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: acme-ids
+          path: tests/integration/acme/seed/
+      - run: cd backend && uv sync --all-extras
+      - name: Boot Acme local services
+        run: docker compose -f tests/integration/docker-compose.yml up -d --wait postgres mysql sql_server trino airflow fixture-api dbt prefect dagster chroma
+      - name: Seed Acme local services
+        run: make acme-seed CONTAINERS_ONLY=1
+      - name: Run background-agent scenarios
+        run: |
+          cd backend
+          uv run --with pytest-json-report python -m pytest ../tests/integration/acme/e2e/test_background_agents.py -v \
+            --json-report --json-report-file="../agents.json"
+        env:
+          RUN_ACME_E2E: "1"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NOTION_INTEGRATION_TOKEN: ${{ secrets.NOTION_INTEGRATION_TOKEN }}
+          NOTION_TEST_PARENT_PAGE_ID: ${{ secrets.NOTION_TEST_PARENT_PAGE_ID || inputs.notion_parent_page_id }}
+          NOTION_TEST_DATABASE_IDS: ${{ secrets.NOTION_TEST_DATABASE_IDS }}
+          GITHUB_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          GH_TEST_TOKEN: ${{ secrets.GH_TEST_TOKEN }}
+          GH_TEST_REPO: ${{ secrets.GH_TEST_REPO }}
+          GITHUB_TEST_REPO: ${{ secrets.GH_TEST_REPO || inputs.github_test_repo || format('{0}/{1}', github.repository_owner, secrets.ACME_GITHUB_REPO_NAME || 'dataclaw-acme-dbt') }}
+          ACME_GITHUB_WORKFLOW_RUN_ID: ${{ github.run_id }}
+          CONFLUENCE_SITE_URL: ${{ secrets.CONFLUENCE_SITE_URL }}
+          CONFLUENCE_EMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
+          CONFLUENCE_API_TOKEN: ${{ secrets.CONFLUENCE_API_TOKEN }}
+          CONFLUENCE_API_BASIC_AUTH_TOKEN: ${{ secrets.CONFLUENCE_API_BASIC_AUTH_TOKEN }}
+          CONFLUENCE_API_OAUTH_TOKEN: ${{ secrets.CONFLUENCE_API_OAUTH_TOKEN }}
+          CONFLUENCE_SPACE_KEY: ${{ secrets.CONFLUENCE_SPACE_KEY || inputs.confluence_space_key || 'ACME' }}
+          BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
+          BIGQUERY_PROJECT_ID: ${{ secrets.BIGQUERY_PROJECT_ID }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE || inputs.snowflake_warehouse || 'COMPUTE_WH' }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+          SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
+          DATABRICKS_WORKSPACE_URL: ${{ secrets.DATABRICKS_WORKSPACE_URL }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          REDSHIFT_CLUSTER_ENDPOINT: ${{ secrets.REDSHIFT_CLUSTER_ENDPOINT }}
+          REDSHIFT_ENDPOINT: ${{ secrets.REDSHIFT_ENDPOINT }}
+          REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_DATABASE }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_USER }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_PASSWORD }}
+          FIVETRAN_API_KEY: ${{ secrets.FIVETRAN_API_KEY }}
+          FIVETRAN_API_SECRET: ${{ secrets.FIVETRAN_API_SECRET }}
+          FIVETRAN_CONNECTOR_ID: ${{ secrets.FIVETRAN_CONNECTOR_ID }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: agents
+          path: agents.json
+
+  report:
+    needs: [coverage, compile-retrieval, chat-scenarios, background-agents]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          path: artifacts
+      - run: cd backend && uv sync --all-extras
+      - run: cd backend && uv run python ../tests/integration/acme/report/aggregate.py
+      - name: Commit Acme reports
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || startsWith(github.ref, 'refs/tags/')
+        run: |
+          git config user.name "dataclaw-bot"
+          git config user.email "bot@dataclaw.local"
+          git add docs/MCP_COVERAGE.md docs/E2E_REPORT.md
+          git commit -m "Update Acme rig reports" || echo "No report changes"
+          target_ref="${GITHUB_REF_NAME}"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            target_ref="${{ github.event.repository.default_branch }}"
+          fi
+          git push origin "HEAD:${target_ref}"
+      - run: cd backend && uv run python ../tests/integration/acme/report/check_all_green.py

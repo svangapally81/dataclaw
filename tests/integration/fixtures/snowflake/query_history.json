@@ -1,0 +1,44 @@
+{
+  "queries": [
+    {
+      "query_id": "01b4f1f0-0000-0000-0000-000000000001",
+      "warehouse_name": "ANALYTICS_WH",
+      "database_name": "ANALYTICS",
+      "schema_name": "CORE",
+      "user_name": "DATACLAW",
+      "query_text": "select count(*) from core.customers where created_at >= dateadd(day, -30, current_timestamp())",
+      "execution_status": "SUCCESS",
+      "start_time": "2026-05-12T00:00:00Z",
+      "total_elapsed_time_ms": 142,
+      "bytes_scanned": 1048576,
+      "rows_produced": 1
+    },
+    {
+      "query_id": "01b4f1f0-0000-0000-0000-000000000002",
+      "warehouse_name": "ANALYTICS_WH",
+      "database_name": "ANALYTICS",
+      "schema_name": "CORE",
+      "user_name": "DATACLAW",
+      "query_text": "merge into core.customer_360 target using staging.customer_360 source on target.customer_id = source.customer_id",
+      "execution_status": "SUCCESS",
+      "start_time": "2026-05-12T00:05:00Z",
+      "total_elapsed_time_ms": 2401,
+      "bytes_scanned": 8388608,
+      "rows_inserted": 41,
+      "rows_updated": 913
+    },
+    {
+      "query_id": "01b4f1f0-0000-0000-0000-000000000003",
+      "warehouse_name": "LOADER_WH",
+      "database_name": "ANALYTICS",
+      "schema_name": "EVENTS",
+      "user_name": "AIRBYTE",
+      "query_text": "copy into events.product_events from @raw_events_stage",
+      "execution_status": "FAILED_WITH_ERROR",
+      "error_message": "JSON parsing error near row 884: unexpected token in properties",
+      "start_time": "2026-05-12T00:10:00Z",
+      "total_elapsed_time_ms": 733,
+      "bytes_scanned": 4194304
+    }
+  ]
+}

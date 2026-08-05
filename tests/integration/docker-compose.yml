@@ -1,0 +1,343 @@
+services:
+  chroma:
+    image: chromadb/chroma:1.5.9
+    ports:
+      - "18001:8000"
+    volumes:
+      - chroma-data:/chroma/chroma
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: dataclaw
+      POSTGRES_PASSWORD: dataclaw
+      POSTGRES_DB: dataclaw_integration
+    ports:
+      - "15432:5432"
+    volumes:
+      - ./postgres/01_seed.sql:/docker-entrypoint-initdb.d/01_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "test \"$(head -1 /var/lib/postgresql/data/postmaster.pid 2>/dev/null)\" = \"1\" && psql -U dataclaw -d dataclaw_integration -tAc 'select 1 from core.customers limit 1' | grep -q 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 45s
+
+  mysql:
+    image: mysql:8.0
+    command:
+      - --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: dataclaw
+      MYSQL_DATABASE: dataclaw_integration
+      MYSQL_USER: dataclaw
+      MYSQL_PASSWORD: dataclaw
+    ports:
+      - "13306:3306"
+    volumes:
+      - ./mysql/01_seed.sql:/docker-entrypoint-initdb.d/01_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -udataclaw -pdataclaw --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 90s
+
+  sql_server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "DataClaw!Passw0rd"
+      MSSQL_PID: Developer
+    ports:
+      - "11433:1433"
+
+  bigquery:
+    image: ghcr.io/goccy/bigquery-emulator:latest
+    command:
+      - --project=dataclaw-integration
+      - --dataset=core
+      - --dataset=marketing
+      - --dataset=events
+    ports:
+      - "19050:9050"
+      - "19060:9060"
+
+  trino:
+    image: trinodb/trino:latest
+    ports:
+      - "18088:8080"
+    volumes:
+      - ./trino/catalog:/etc/trino/catalog:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/v1/info || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  airflow:
+    image: apache/airflow:2.10.3
+    command: standalone
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
+      _AIRFLOW_DB_MIGRATE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - airflow-logs:/opt/airflow/logs
+    ports:
+      - "18080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/api/v1/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
+      start_period: 180s
+
+  airbyte:
+    image: airbyte/server:1.0.0
+    depends_on:
+      airbyte-db:
+        condition: service_healthy
+      airbyte-bootloader:
+        condition: service_completed_successfully
+      airbyte-temporal:
+        condition: service_started
+      airbyte-worker:
+        condition: service_started
+    environment:
+      CONFIG_ROOT: /data
+      AIRBYTE_VERSION: 1.0.0
+      DATABASE_HOST: airbyte-db
+      DATABASE_PORT: 5432
+      DATABASE_DB: airbyte
+      DATABASE_USER: airbyte
+      DATABASE_PASSWORD: airbyte
+      DATABASE_URL: jdbc:postgresql://airbyte-db:5432/airbyte
+      DATABASE_USERNAME: airbyte
+      WORKSPACE_ROOT: /tmp/workspace
+      LOCAL_ROOT: /tmp/airbyte_local
+      STORAGE_TYPE: local
+      AIRBYTE_FLYWAY_CONFIGS_MINIMUM_MIGRATION_VERSION: 0.30.22.001
+      AIRBYTE_FLYWAY_JOBS_MINIMUM_MIGRATION_VERSION: 0.29.15.001
+      TEMPORAL_HOST: airbyte-temporal:7233
+    ports:
+      - "18081:8001"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8001/api/v1/health || curl -fsS http://localhost:8001/v1/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 40
+      start_period: 90s
+
+  airbyte-db:
+    image: airbyte/db:1.0.0
+    environment:
+      POSTGRES_USER: airbyte
+      POSTGRES_PASSWORD: airbyte
+      POSTGRES_DB: airbyte
+    volumes:
+      - airbyte-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airbyte -d airbyte"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  airbyte-temporal:
+    image: temporalio/auto-setup:1.22.4
+    depends_on:
+      airbyte-db:
+        condition: service_healthy
+    environment:
+      DB: postgresql
+      POSTGRES_SEEDS: airbyte-db
+      DB_PORT: 5432
+      POSTGRES_USER: airbyte
+      POSTGRES_PWD: airbyte
+
+  airbyte-bootloader:
+    image: airbyte/bootloader:1.0.0
+    depends_on:
+      airbyte-db:
+        condition: service_healthy
+    environment:
+      CONFIG_ROOT: /data
+      AIRBYTE_VERSION: 1.0.0
+      DATABASE_HOST: airbyte-db
+      DATABASE_PORT: 5432
+      DATABASE_DB: airbyte
+      DATABASE_USER: airbyte
+      DATABASE_PASSWORD: airbyte
+      DATABASE_URL: jdbc:postgresql://airbyte-db:5432/airbyte
+      DATABASE_USERNAME: airbyte
+      WORKSPACE_ROOT: /tmp/workspace
+      LOCAL_ROOT: /tmp/airbyte_local
+      STORAGE_TYPE: local
+      AIRBYTE_FLYWAY_CONFIGS_MINIMUM_MIGRATION_VERSION: 0.30.22.001
+      AIRBYTE_FLYWAY_JOBS_MINIMUM_MIGRATION_VERSION: 0.29.15.001
+
+  airbyte-worker:
+    image: airbyte/worker:1.0.0
+    depends_on:
+      airbyte-db:
+        condition: service_healthy
+      airbyte-bootloader:
+        condition: service_completed_successfully
+      airbyte-temporal:
+        condition: service_started
+    environment:
+      CONFIG_ROOT: /data
+      AIRBYTE_VERSION: 1.0.0
+      DATABASE_HOST: airbyte-db
+      DATABASE_PORT: 5432
+      DATABASE_DB: airbyte
+      DATABASE_USER: airbyte
+      DATABASE_PASSWORD: airbyte
+      DATABASE_URL: jdbc:postgresql://airbyte-db:5432/airbyte
+      DATABASE_USERNAME: airbyte
+      WORKSPACE_ROOT: /tmp/workspace
+      LOCAL_ROOT: /tmp/airbyte_local
+      STORAGE_TYPE: local
+      AIRBYTE_FLYWAY_CONFIGS_MINIMUM_MIGRATION_VERSION: 0.30.22.001
+      AIRBYTE_FLYWAY_JOBS_MINIMUM_MIGRATION_VERSION: 0.29.15.001
+      TEMPORAL_HOST: airbyte-temporal:7233
+
+  airbyte-webapp:
+    image: airbyte/webapp:1.0.0
+    depends_on:
+      - airbyte
+    environment:
+      AIRBYTE_SERVER_HOST: airbyte
+      AIRBYTE_SERVER_PORT: 8001
+      CONNECTOR_BUILDER_API_HOST: airbyte
+      CONNECTOR_BUILDER_API_PORT: 8001
+      KEYCLOAK_INTERNAL_HOST: airbyte
+      KEYCLOAK_INTERNAL_PORT: 8001
+
+  prefect:
+    image: prefecthq/prefect:3-latest
+    command: prefect server start --host 0.0.0.0 --port 8080
+    ports:
+      - "18082:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/api/health', timeout=2)\""]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  dagster:
+    build:
+      context: .
+      dockerfile: dagster/Dockerfile
+    working_dir: /tmp
+    environment:
+      TMPDIR: /tmp
+    volumes:
+      - ./services:/services:ro
+    ports:
+      - "18083:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/server_info', timeout=2)\""]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  fixture-api:
+    build:
+      context: ./services
+    environment:
+      CONNECTOR_SERVICE: fixture
+    volumes:
+      - ./services:/services:ro
+    ports:
+      - "18084:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=2)\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  notion:
+    build:
+      context: ./services
+    environment:
+      CONNECTOR_SERVICE: notion
+    volumes:
+      - ./services:/services:ro
+    ports:
+      - "18085:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/v1/users/me', timeout=2)\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  github:
+    build:
+      context: ./services
+    environment:
+      CONNECTOR_SERVICE: github
+    volumes:
+      - ./services:/services:ro
+    ports:
+      - "18086:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/user', timeout=2)\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  gitea:
+    image: gitea/gitea:latest
+    environment:
+      GITEA__security__INSTALL_LOCK: "true"
+      GITEA__database__DB_TYPE: sqlite3
+      GITEA__server__HTTP_PORT: "3000"
+    ports:
+      - "13000:3000"
+    volumes:
+      - gitea-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/healthz >/dev/null 2>&1 || wget -qO- http://localhost:3000/ >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  confluence:
+    image: atlassian/confluence-server:latest
+    ports:
+      - "18089:8090"
+    volumes:
+      - confluence-data:/var/atlassian/application-data/confluence
+
+  dbt:
+    build:
+      context: ./services
+    environment:
+      CONNECTOR_SERVICE: dbt
+    volumes:
+      - ./services:/services:ro
+    ports:
+      - "18087:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/api/v2/accounts/1/projects/', timeout=2)\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  chroma-data:
+  airflow-logs:
+  airbyte-db:
+  gitea-data:
+  confluence-data:
